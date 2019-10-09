@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<!-- 试题管理  -->
+<struts>
+    <package name="theme" extends="eap-default" namespace="/exam/base/theme">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	total,themeNameTerm,themelist\[\d+\]\.[A-Za-z0-9_]+
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                	themelist\[\d+\]\.themeInBanks,
+                	themelist\[\d+\]\.themeAnswerkeies,
+                	themelist\[\d+\]\.testpaperThemes,
+                	themelist\[\d+\]\.themeSearchKeies
+                </param>
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">
+                form\.[A-Za-z0-9_]+,
+                form\.themeAnswerkeyFormList\[\d+\]\.[A-Za-z0-9_]+,
+                form\.themeSpecialityFormList\[\d+\]\.[A-Za-z0-9_]+,
+                form\.themePostFormList\[\d+\]\.[A-Za-z0-9_]+,
+                form\.themeBankFormList\[\d+\]\.[A-Za-z0-9_]+,
+                form\.lastFkAuditEmp\.employeeId,
+				form\.lastFkAuditEmp\.employeeName
+                </param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="themeFkauditFormList">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	themeFkauditFormList\[\d+\]\.[A-Za-z0-9_]+,themeFkauditFormListTotal
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                	themelist\[\d+\]\.themeInBanks,
+                	themelist\[\d+\]\.themeAnswerkeies,
+                	themelist\[\d+\]\.testpaperThemes,
+                	themelist\[\d+\]\.themeSearchKeies
+                </param>
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="themeTypeList">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+	                themeTypeList\[\d+\]\.themeTypeId,
+	                themeTypeList\[\d+\]\.themeTypeName,
+	                themeTypeList\[\d+\]\.themeType
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                </param>
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="saveThemeImgFlag">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success,width,height,imageFileName,imageFilePath,imageContent</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            
+            
+            <result type="json" name="checkAllTheme">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success,checkFinNum,checkSumNum</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="checkThemeFinNum">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">checkFinNum,checkSumNum</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+             <result type="json" name="queryEmployeeXxb">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">empXxb</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+             <result type="json" name="queryEmpXxbList">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+	                empXxbItemList\[\d+\]\.[A-Za-z0-9_]+,empXxbItemListTotal
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                </param>
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

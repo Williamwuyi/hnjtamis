@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="standardtermsEx" extends="eap-default" namespace="/jobstandard/termsEx">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+            	<param name="includeProperties">
+            	total,
+            	list\[\d+\]\.[A-Za-z0-9_]+
+            	</param>
+            	<param name="excludeProperties">
+            	list\[\d+\]\.standardTypes,
+            	list\[\d+\]\.themeBank,
+            	list\[\d+\]\.jobsStandardQuarters,
+            	list\[\d+\]\.jobsUnionStandards,
+            	list\[\d+\]\.jobsStandardThemebanks</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="jobsStandardQuarterList">
+            	<param name="includeProperties">
+            	jobsStandardQuarterTotal,
+            	jobsStandardQuarterList\[\d+\]\.[A-Za-z0-9_]+
+            	</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">
+	                form\.[A-Za-z0-9_]+,
+	                form.standardTypes.jstypeid,
+	                form.standardTypes.typename,
+	                form.themeBank.themeBankId,
+	                form.themeBank.themeBankName,
+	                form.thisquarter.quarterId,
+	                form.thisquarter.quarterName,
+	            	form.jobsUnionStandards\[\d+\]\.jobsname,
+	            	form.jobsUnionStandards\[\d+\]\.jobscode,
+	            	form.jobsStandardQuarters\[\d+\]\.quarterTrainCode,
+	            	form.jobsStandardQuarters\[\d+\]\.quarterTrainName,
+	            	form.jobsStandardQuarters\[\d+\]\.deptName,
+	            	form.jobsStandardThemebanks\[\d+\]\.themeBankId,
+	            	form.jobsStandardThemebanks\[\d+\]\.themeBankName
+	            	
+            	</param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="tree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="quartersTree">
+                <param name="includeProperties">
+                	quarters.*
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param>
+            </result>
+             <result type="json" name="quarterStandardList">
+                <param name="root">quarterStandardList</param>
+                <param name="includeProperties"></param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findBankIds">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">bankIds</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

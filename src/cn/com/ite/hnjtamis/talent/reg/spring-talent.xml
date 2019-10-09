@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="TalentRegistrationListAction"
+		class="cn.com.ite.hnjtamis.talent.reg.TalentRegistrationListAction"
+		scope="prototype">
+		<property name="service" ref="talentRegistrationService" />
+	</bean>
+	<bean id="TalentRegistrationFormAction"
+		class="cn.com.ite.hnjtamis.talent.reg.TalentRegistrationFormAction"
+		scope="prototype">
+		<property name="service" ref="talentRegistrationService" />
+	</bean>
+	<bean id="talentRegistrationService"
+		class="cn.com.ite.hnjtamis.talent.reg.TalentRegistrationServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="talentRegistrationDao" />
+	</bean>
+	<bean id="talentRegistrationDao" class="cn.com.ite.hnjtamis.talent.reg.TalentRegistrationDaoImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass" value="cn.com.ite.hnjtamis.talent.domain.TalentRegistration" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		            from TalentRegistration t
+		            where (t.name like '%'||:nameTerm||'%' or :nameTerm is null)
+		              and (t.quarter.id = :quarterTerm or :quarterTerm is null)
+		              and (t.id in(select v.talentRegistration.id from TalentRegistrationSpeciality v 
+		              				where v.speciality.specialityid = :specialityTerm)
+		               or :specialityTerm is null)
+		              and (t.type = :typeTerm or :typeTerm is null)
+		              and (t.organ.organId = :organTerm or t.organ.organ.organId = :organTerm or t.quarter.dept.organ.organId = :organTerm or :organTerm is null)
+		              and (t.quarter.dept.deptId = :deptTerm or :deptTerm is null)
+		              order by  t.specialityNames,t.employee.employeeCode
+		            ]]></value>
+				</entry>
+				<entry key="queryChartHql">
+					<value>
+		            <![CDATA[
+		            select v.speciality.specialityname as specialityName, count(v.reSpecialityId) as talentCount from 
+		            TalentRegistrationSpeciality v where (v.speciality.specialityid = :specialityTerm or :specialityTerm is null)
+		            and v.talentRegistration.id in(select t.id from TalentRegistration t
+		            	where (t.name like '%'||:nameTerm||'%' or :nameTerm is null)
+		              and (t.quarter.id = :quarterTerm or :quarterTerm is null)
+		              and (t.type = :typeTerm or :typeTerm is null)
+		              and (t.organ.organId = :organTerm or t.organ.organ.organId = :organTerm or t.quarter.dept.organ.organId = :organTerm or :organTerm is null)
+		              and (t.quarter.dept.deptId = :deptTerm or :deptTerm is null))
+		              group by v.speciality.specialityname
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+		<property name="sqlMap">
+			<map>
+				<entry key="queryTreeSql">
+					<value>
+						<![CDATA[
+						select *
+							  from TALENT_REGISTRATION t
+							 where t.organ_id in
+							       (select o.organ_id
+							          from organ o
+							         start with o.organ_id = :organTerm
+							        connect by prior o.organ_id = o.parent_organ_id)
+						]]>
+					</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

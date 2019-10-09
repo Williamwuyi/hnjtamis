@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.Accessory" table="ACCESSORY_FILE">
+        <comment>附件</comment>
+        <id name="acceId" type="java.lang.String">
+            <column name="ACCE_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="acceType" type="java.lang.String">
+            <column name="ACCE_TYPE" length="64">
+                <comment>对应config中配置的类型</comment>
+            </column>
+        </property>
+        <property name="filePath" type="java.lang.String">
+            <column name="FILE_PATH" length="200">
+                <comment>文件路径</comment>
+            </column>
+        </property>
+        <property name="itemId" type="java.lang.String">
+            <column name="ITEM_ID" length="64">
+                <comment>项目ID</comment>
+            </column>
+        </property>
+        <property name="fileName" type="java.lang.String">
+            <column name="FILE_NAME" length="200">
+                <comment>文件名称</comment>
+            </column>
+        </property>
+        <property name="fileSize" type="java.lang.Double">
+            <column name="FILE_SIZE" precision="10">
+                <comment>文件大小</comment>
+            </column>
+        </property>
+        <property name="uploadDate" type="java.util.Date">
+            <column name="UPLOAD_DATE" length="7">
+                <comment>上传时间</comment>
+            </column>
+        </property>
+        <property name="showImage" type="boolean">
+            <column name="IS_SHOW_IMAGE">
+                <comment>是否以图片显示：0、否 1、是</comment>
+            </column>
+        </property>
+        <property name="employeeid" type="java.lang.String">
+            <column name="EMPLOYEEID" length="64">
+                <comment>员工ID</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>排序</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

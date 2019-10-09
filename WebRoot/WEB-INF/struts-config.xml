@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <!-- 请求参数的编码方式 -->  
+    <constant name="struts.i18n.encoding" value="UTF-8"/>  
+    <!-- 指定被struts2处理的请求后缀类型。多个用逗号隔开 -->  
+    <constant name="struts.action.extension" value="action"/>  
+    <!-- 当struts.xml改动后，是否重新加载。默认值为false(生产环境下使用),开发阶段最好打开  -->  
+    <constant name="struts.configuration.xml.reload" value="true"/>  
+    <!-- 是否使用struts的开发模式。开发模式会有更多的调试信息。默认值为false(生产环境下使用),开发阶段最好打开  -->  
+    <constant name="struts.devMode" value="false"/>  
+    <!-- 设置浏览器是否缓存静态内容。默认值为true(生产环境下使用),开发阶段最好关闭  -->  
+    <constant name="struts.serve.static.browserCache" value="false" />  
+    <!-- 是否允许在OGNL表达式中调用静态方法，默认值为false -->  
+    <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>  
+    <!-- 指定由spring负责action对象的创建  org.apache.struts2.spring.StrutsSpringObjectFactory-->
+    <constant name="struts.objectFactory" value="spring" />  
+    <constant name="struts.objectFactory.spring.autoWire" value="name" /> 
+    <!-- 是否开启动态方法调用 -->  
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
+    <!-- 上传文件大小限制 -->  
+    <constant name="struts.multipart.maxSize" value="1000000000" />
+    <package name="eap-default" extends="struts-default">
+       <result-types>
+          <result-type name="json" class="org.apache.struts2.json.JSONResult"/>
+       </result-types>
+       <interceptors>
+        <interceptor-stack name="defaultStack">
+                <interceptor-ref name="exception"/>
+                <interceptor-ref name="alias"/>
+                <interceptor-ref name="servletConfig"/>
+                <interceptor-ref name="i18n"/>
+                <interceptor-ref name="prepare"/>
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="debugging"/>
+                <interceptor-ref name="scopedModelDriven"/>
+                <interceptor-ref name="modelDriven"/>
+                <interceptor-ref name="fileUpload"/>
+                <interceptor-ref name="checkbox"/>
+                <interceptor-ref name="multiselect"/>
+                <interceptor-ref name="staticParams"/>
+                <interceptor-ref name="actionMappingParams"/>
+                <interceptor-ref name="params">
+                  <param name="excludeParams">dojo/..*,^struts/..*,_dc</param>
+                </interceptor-ref>
+                <interceptor-ref name="conversionError"/>
+                <interceptor-ref name="validation">
+                    <param name="excludeMethods">input,back,cancel,browse</param>
+                </interceptor-ref>
+                <interceptor-ref name="workflow">
+                    <param name="excludeMethods">input,back,cancel,browse</param>
+                </interceptor-ref>
+            </interceptor-stack>
+          </interceptors>
+          <global-results> 
+              <!--<result name="404">/WEB-INF/view/404.jsp</result>-->
+              <result name="json_error">/jsonError.jsp</result>
+	      </global-results>  
+	      <!-- 定义全局异常-->  
+	      <global-exception-mappings>
+	          <exception-mapping result="json_error" exception="java.lang.Exception"/>  
+	      </global-exception-mappings> 
+    </package>
+    <package name="log" extends="eap-default" namespace="/baseinfo/log">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">total,list.*</param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">list\[\d+\]\.logDatas</param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="root">form</param>
+                <!-- <param name="includeProperties">form\.[A-Za-z0-9_]+,form\.logDatas\[\d+\]\.[A-Za-z0-9_]+,form\.logDatas\[\d+\]\.logSubs\[\d+\]\.[A-Za-z0-9_]+</param> -->
+                <param name="excludeProperties">logDatas\[\d+\]\.logMain,logDatas\[\d+\]\.logSubs\[\d+\]\.logForigns</param> 
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

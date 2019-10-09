@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 试卷模版生成  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="TestpaperExpDocAction" class="cn.com.ite.hnjtamis.exam.testpaper.TestpaperExpDocAction" scope="prototype" >
+			<property name="service" ref="testpaperService" />
+		</bean>
+		<bean id="TestpaperListAction" class="cn.com.ite.hnjtamis.exam.testpaper.TestpaperListAction" scope="prototype" >
+		    <property name="service" ref="testpaperService" />
+		</bean>
+		<bean id="TestpaperFormAction" class="cn.com.ite.hnjtamis.exam.testpaper.TestpaperFormAction" scope="prototype" >
+		    <property name="service" ref="testpaperService" />
+		</bean>
+		<bean id="testpaperService" class="cn.com.ite.hnjtamis.exam.testpaper.TestpaperServiceImpl" scope="prototype">
+		    <property name="dao" ref="testpaperDao" />
+		</bean>
+		<bean id="testpaperDao" class="cn.com.ite.hnjtamis.exam.testpaper.TestpaperDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.Testpaper"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="testpaperForParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where
+		           		  ( a.testpaperName like '%' ||:testpaperNameTerm || '%' or :testpaperNameTerm is null )
+		           		  and ( ',' ||  :examType || ',' like '%,' || a.examProperty || ',%'  or :examType is null)
+		           		  and (a.createdIdBy = :employeeId or :employeeId is null)
+		           		  
+		           		  
+		           		  and (a.totalTheme >= :totalThemeMinTerm or :totalThemeMinTerm is null)
+		           		  and (a.totalTheme <  :totalThemeMaxTerm or :totalThemeMaxTerm is null)
+		           		  and (a.totalScore >= :totalScoreMinTerm or :totalScoreMinTerm is null)
+		           		  and (a.totalScore <  :totalScoreMaxTerm or :totalScoreMaxTerm is null)
+		           		  and (a.createdBy like '%' || :createdByTerm || '%' or :createdByTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') >= to_date(:creationDateMaxTerm,'yyyy-MM-dd') or :creationDateMaxTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') <  to_date(:creationDateMinTerm,'yyyy-MM-dd') or :creationDateMinTerm is null)
+		           		  and (a.state = :stateTerm or :stateTerm is null)
+		           		  
+		           		  and(a.organId = :organIdTerm  or :organIdTerm is null )
+		           		  
+		           		 order by creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="testpaperForEmployeeParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where
+		           		  ( a.testpaperName like '%' ||:testpaperNameTerm || '%' or :testpaperNameTerm is null )
+		           		  and ( ',' ||  :examType || ',' like '%,' || a.examProperty || ',%'  or :examType is null)
+		           		  and (a.createdIdBy = :employeeId or :employeeId is null)
+		           		  
+		           		  
+		           		  and (a.totalTheme >= :totalThemeMinTerm or :totalThemeMinTerm is null)
+		           		  and (a.totalTheme <  :totalThemeMaxTerm or :totalThemeMaxTerm is null)
+		           		  and (a.totalScore >= :totalScoreMinTerm or :totalScoreMinTerm is null)
+		           		  and (a.totalScore <  :totalScoreMaxTerm or :totalScoreMaxTerm is null)
+		           		  and (a.createdBy like '%' || :createdByTerm || '%' or :createdByTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') >= to_date(:creationDateMaxTerm,'yyyy-MM-dd') or :creationDateMaxTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') <  to_date(:creationDateMinTerm,'yyyy-MM-dd') or :creationDateMinTerm is null)
+		           		  and (a.state = :stateTerm or :stateTerm is null)
+		           		  
+		           		  and(a.createdIdBy = :employeeIdTerm  or :employeeIdTerm is null )
+		           		  
+		           		 order by creationDate desc
+		            ]]></value>      
+		            </entry>   
+		            <entry key="testpaperForDeptParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where
+		           		  ( a.testpaperName like '%' ||:testpaperNameTerm || '%' or :testpaperNameTerm is null )
+		           		  and ( ',' ||  :examType || ',' like '%,' || a.examProperty || ',%'  or :examType is null)
+		           		  and (a.createdIdBy = :employeeId or :employeeId is null)
+		           		  
+		           		  
+		           		  and (a.totalTheme >= :totalThemeMinTerm or :totalThemeMinTerm is null)
+		           		  and (a.totalTheme <  :totalThemeMaxTerm or :totalThemeMaxTerm is null)
+		           		  and (a.totalScore >= :totalScoreMinTerm or :totalScoreMinTerm is null)
+		           		  and (a.totalScore <  :totalScoreMaxTerm or :totalScoreMaxTerm is null)
+		           		  and (a.createdBy like '%' || :createdByTerm || '%' or :createdByTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') >= to_date(:creationDateMaxTerm,'yyyy-MM-dd') or :creationDateMaxTerm is null)
+		           		  and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') <  to_date(:creationDateMinTerm,'yyyy-MM-dd') or :creationDateMinTerm is null)
+		           		  and (a.state = :stateTerm or :stateTerm is null)
+		           		  
+		           		  and a.createdIdBy in (select employeeId from Employee e where  ',' ||  :deptIdTerm || ',' like '%,' || e.dept.deptId || ',%' ) 
+		           		  
+		           		 order by creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="themeInTemplateHql">
+		            <value>
+		            <![CDATA[
+		           		 from TestpaperTheme a where a.testpaper.testpaperId = :testpaperId  order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="testpaperInExamTypeIdTreeHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where a.examTypeId = :examTypeId 
+		           		 and (a.organId = :organIdTerm  or :organIdTerm is null ) 
+		           		 and a.isUse = 10 
+		           		 and a.state = 15
+		           		 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="usedTestpaperInExamTypeIdTreeHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where a.examTypeId = :examTypeId 
+		           		 and (a.organId = :organIdTerm  or :organIdTerm is null ) 
+		           		 and exists(select 1 from Exam tt where tt.testpaper.testpaperId = a.testpaperId)
+		           		 and a.isUse = 10 
+		           		 and a.state = 15
+		           		 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="unUsedTestpaperInExamTypeIdTreeHql">
+		            <value>
+		            <![CDATA[
+		           		 from Testpaper a where a.examTypeId = :examTypeId 
+		           		 and (a.organId = :organIdTerm  or :organIdTerm is null ) 
+		           		 and not exists(select 1 from Exam tt where tt.testpaper.testpaperId = a.testpaperId)
+		           		 and a.isUse = 10 
+		           		 and a.state = 15
+		           		 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="themeSelectHql">
+		            <value>
+		            <![CDATA[
+		           		 from  Theme a where a.themeType.themeTypeId = :themeTypeId and a.isUse = 5 and a.state = 15
+		           		 	and (:specialityid is null or exists ( 
+		           		 			select 1 from ThemeInBank b  where b.theme.themeId = a.themeId  
+		           		 					and exists(select 1 from ThemeBankProfession p 
+		           		 						where p.themeBank.themeBankId = b.themeBank.themeBankId and p.speciality.specialityid = :specialityid)
+		           		 						)
+		           		 		)
+		                	and (:themeBankIds is null or exists(select 1 from ThemeInBank b 
+		                	      where b.theme.themeId = a.themeId and ',' || :themeBankIds || ',' like '%,' || b.themeBank.themeBankId || ',%'))
+		                	and ( :examType is null or ',' || :examType || ',' like  '%,' || a.type || ',%')
+		                	and (:employeeId is null 
+		                	or not exists(select 1 from ExamTestpaperTheme k 
+		                		where k.themeId = a.themeId and exists( select 1 from ExamUserTestpaper et  
+		                				where  k.examTestpaper.examTestpaperId = et.examTestpaper.examTestpaperId 
+		                				and et.employeeId = :employeeId )
+		                	))
+		           		 order by a.themeSetNum
+		            ]]></value>
+		            </entry>
+		            <entry key="themeTypeInTestpaperThemeHql">
+		            <value>
+		            <![CDATA[
+		           		 from ThemeType t where t.themeTypeId in
+		           		 	(select a.themeType.themeTypeId 
+		           		 	from TestpaperTheme a where a.testpaper.testpaperId = :testpaperId) order by t.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="handThemeOnlyThemeBankHql">
+		            <value>
+		            <![CDATA[
+		           		 from  Theme a where exists(select 1 from ThemeInBank b 
+		                	      where b.theme.themeId = a.themeId 
+		                	      		and instr(',' || :themeBankIds || ',' , ',' || b.themeBank.themeBankId || ',') >0 
+		                	      		and b.theme.themeId is not null)
+		           		 and  a.isUse = 5 and a.state = 15 
+		           		 order by a.themeType.sortNum desc,a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="handThemeAllParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from  Theme a where 
+		           		 	instr(',' || :selectThemeIds || ',' , ',' || a.themeId || ',') = 0
+							and exists(select 1 from ThemeInBank b 
+		                	      where b.theme.themeId = a.themeId 
+		                	      and instr(',' || :themeBankIds || ',' , ',' || b.themeBank.themeBankId || ',') > 0 
+		                	      and b.theme.themeId is not null)
+		           		 and  a.isUse = 5 and a.state = 15 
+		           		 order by a.themeType.sortNum desc,a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="handThemeHql">
+		            <value>
+		            <![CDATA[
+		           		 from  Theme a where 
+		           		 	(:selectThemeIds is null or instr(',' || :selectThemeIds || ',' , ',' || a.themeId || ',') = 0)
+							and exists(select 1 from ThemeInBank b 
+		                	      where b.theme.themeId = a.themeId 
+		                	      	and (instr(',' || :themeBankIds || ',' , ',' || b.themeBank.themeBankId || ',') > 0
+		                	      		or :themeBankIds is null )  and b.theme.themeId is not null)
+		           		 and  a.isUse = 5 and a.state = 15 
+		           		 order by a.themeType.sortNum desc,a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryTestpaperThemeAnswerkeyInTestpaperHql">
+		            <value>
+		            <![CDATA[
+		           		 from  TestpaperThemeAnswerkey a where 
+		           		 a.testpaperTheme.testpaper.testpaperId = :testpaperId
+		           		 order by a.testpaperTheme.testpaperThemeId,a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryAnswerkeyInThemeIdsHql">
+		            <value>
+		            <![CDATA[
+		           		 from  ThemeAnswerkey a where 
+		           		 instr(',' || :themeIds || ',' , ',' || a.theme.themeId || ',') > 0 
+		           		 order by a.theme.themeId,a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		             <entry key="queryAnswerkeyInThemeIdsnewHql">
+		            <value>
+		            <![CDATA[
+		           		 from  ThemeAnswerkey a where 
+		           		 a.theme.themeId in (:themeIds)
+		           		 order by a.theme.themeId,a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		             <entry key="queryThemeInTespaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		 from  Theme a where 
+		           		 a.themeId in (select v.theme.themeId from TestpaperTheme v 
+		           		 where v.testpaper.testpaperId = :testpaperId) 
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryThemeInBankInTespaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		 from  ThemeInBank a where 
+		           		 a.theme.themeId in (select v.theme.themeId from TestpaperTheme v 
+		           		 where v.testpaper.testpaperId = :testpaperId) 
+		           		 order by a.themeBank.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryThemeInBankInBankIdsHql">
+		            <value>
+		            <![CDATA[
+		           		 from  ThemeInBank a where 
+		           		 instr(',' || :themeBankIds || ',' , ',' || a.themeBank.themeBankId || ',') > 0
+		           		 order by a.themeBank.sortNum
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		     <property name="sqlMap">
+		        <map>
+		            <entry key="queryBanktreeByIds">
+		            <value>
+		            <![CDATA[
+		           		  select t.theme_bank_id as id,t.theme_bank_name as title,'bank' as type from THEME_BANK t
+							where ',' || :id || ',' like ',%' || t.theme_bank_id || '%,'
+							order by t.sort_num
+		            ]]></value>
+		            </entry>
+		       </map>
+		    </property>
+		</bean>
+</beans>

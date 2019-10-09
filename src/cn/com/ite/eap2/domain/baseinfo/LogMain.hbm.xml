@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.LogMain" table="LOG_MAIN">
+        <comment>日志主信息</comment>
+        <id name="logId" type="java.lang.String">
+            <column name="LOG_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="sessionId" type="java.lang.String">
+            <column name="SESSION_ID" length="64">
+                <comment>会话编号</comment>
+            </column>
+        </property>
+        <property name="user" type="java.lang.String">
+            <column name="USER_NAME" length="64">
+                <comment>操作员</comment>
+            </column>
+        </property>
+        <property name="employee" type="java.lang.String">
+            <column name="EMPLOYEE" length="64">
+                <comment>员工</comment>
+            </column>
+        </property>
+        <property name="dept" type="java.lang.String">
+            <column name="DEPT" length="64">
+                <comment>部门</comment>
+            </column>
+        </property>
+        <property name="organ" type="java.lang.String">
+            <column name="ORGAN" length="64">
+                <comment>部门</comment>
+            </column>
+        </property>
+        <property name="ip" type="java.lang.String">
+            <column name="IP" length="64">
+                <comment>IP地址</comment>
+            </column>
+        </property>
+        <property name="year" type="integer">
+            <column name="LOG_YEAR" length="4">
+                <comment>年</comment>
+            </column>
+        </property>
+        <property name="month" type="integer">
+            <column name="LOG_MONTH" length="2">
+                <comment>月</comment>
+            </column>
+        </property>
+        <property name="day" type="integer">
+            <column name="LOG_DAY" length="2">
+                <comment>日</comment>
+            </column>
+        </property>
+        <property name="time" type="integer">
+            <column name="LOG_TIME" length="5">
+                <comment>时分秒</comment>
+            </column>
+        </property>
+        <property name="type" type="integer">
+            <column name="LOG_TYPE" length="2">
+                <comment>1登录2退出3数据操作4异常错误5警告</comment>
+            </column>
+        </property>
+        <property name="content" type="java.lang.String">
+            <column name="LOG_CONTENT" length="2000">
+                <comment>日志内容</comment>
+            </column>
+        </property>
+        <property name="app" type="java.lang.String">
+            <column name="APP" length="64">
+                <comment>系统名称</comment>
+            </column>
+        </property>
+        <property name="moduleName" type="java.lang.String">
+            <column name="MODULE_NAME" length="100">
+                <comment>模块名称</comment>
+            </column>
+        </property>
+        <property name="workName" type="java.lang.String">
+            <column name="WORK_NAME" length="64">
+                <comment>操作名称</comment>
+            </column>
+        </property>
+        <property name="useTime" type="java.lang.Long">
+            <column name="USE_TIME" precision="10" scale="0">
+                <comment>用时</comment>
+            </column>
+        </property>
+        <set name="logDatas" inverse="false" cascade="all-delete-orphan" lazy="true" order-by="no">
+            <key>
+                <column name="MAIN_ID" length="64">
+                    <comment>日志编号</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.LogData"/>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        <bean id="ThemeFormAction" class="cn.com.ite.eap2.module.baseinfo.affiche.ThemeFormAction" scope="prototype" >
+		</bean>
+		<bean id="AfficheListAction" class="cn.com.ite.eap2.module.baseinfo.affiche.AfficheListAction" scope="prototype" >
+		    <property name="service" ref="afficheServer" />
+		</bean>
+		<bean id="AfficheFormAction" class="cn.com.ite.eap2.module.baseinfo.affiche.AfficheFormAction" scope="prototype" >
+		    <property name="service" ref="afficheServer" />
+		</bean>
+		<bean id="afficheServer" class="cn.com.ite.eap2.module.baseinfo.affiche.AfficheServiceImpl" scope="prototype">
+		    <property name="dao" ref="afficheDao" />
+		</bean>
+		<bean id="afficheDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.baseinfo.SysAffiche"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		            from SysAffiche a where a.title like '%'||:titleTerm||'%' and a.sender like '%'||:senderTerm||'%' 
+		            and (a.sendTime >= :startTimeTerm or :startTimeTerm is null) 
+		            and (a.accessoriesItemId=:accessoriesItemId or :accessoriesItemId is null)
+		            and (a.sendTime <= :endTimeTerm or :endTimeTerm is null) order by a.sendTime desc
+		            ]]></value>
+		            </entry>
+		            <entry key="fileHql">
+		            <value>
+		            <![CDATA[
+		            from Accessory a where a.itemId=:itemId order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="displayHql">
+		            <value>
+		            <![CDATA[
+		            from SysAffiche a where a.sendTime+deadline>=sysdate order by a.sendTime desc,a.saId desc
+		            ]]></value>
+		            </entry>
+		            <entry key="displayEmployeeAfficheHql">
+		            <value>
+		            <![CDATA[
+		            from SysAffiche a where a.sendTime+deadline>=sysdate 
+		            and exists(
+		            	select 1 from SysAfficheIncepter tt where tt.sysAffiche.saId = a.saId
+		            	and  ((tt.incepterId = :organIdTerm and tt.incepterType = '1')
+		            	or (tt.incepterId = :deptIdTerm and tt.incepterType = '2')
+		            	or (tt.incepterId = :quarterIdTerm and tt.incepterType = '3')
+		            	or (tt.incepterId = :employeeIdTerm and tt.incepterType = '4')))
+		            and not exists(select 1 from SysAfficheUserDel su2 where su2.saId = a.saId and su2.delTime is not null
+		            	and su2.account = :accountTerm)
+		            order by a.sendTime desc,a.saId desc
+		            ]]></value>
+		            </entry>
+		            <entry key="displayNotReadHql">
+		            <value>
+		            <![CDATA[
+		            from SysAffiche a where a.sendTime+deadline>=sysdate and exists(
+		            	select 1 from SysAfficheIncepter tt where tt.sysAffiche.saId = a.saId
+		            	and ((tt.incepterId = :organIdTerm and tt.incepterType = '1')
+		            	or (tt.incepterId = :deptIdTerm and tt.incepterType = '2')
+		            	or (tt.incepterId = :quarterIdTerm and tt.incepterType = '3')
+		            	or (tt.incepterId = :employeeIdTerm and tt.incepterType = '4')))
+		            	and not exists(select 1 from SysAfficheUser su where su.saId = a.saId and su.readTime is not null
+		            	and su.account = :accountTerm)
+		            	and not exists(select 1 from SysAfficheUserDel su2 where su2.saId = a.saId and su2.delTime is not null
+		            	and su2.account = :accountTerm)
+		             order by a.sendTime desc,a.saId desc
+		            ]]></value>
+		            </entry>
+		           <entry key="getAllReadAffiche">
+		            <value>
+		            <![CDATA[
+		            from SysAfficheUser a where  a.account = :accountTerm
+		            ]]></value>
+		            </entry>
+		            <entry key="getReadAffiche">
+		            <value>
+		            <![CDATA[
+		            	from SysAfficheUser a where a.saId = :saId and a.account = :accountTerm
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="getUserDelAffiche">
+		            <value>
+		            <![CDATA[
+		            	from SysAfficheUserDel a where a.saId = :saId and a.account = :accountTerm
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

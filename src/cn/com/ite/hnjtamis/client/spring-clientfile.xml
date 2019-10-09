@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="ClientFileListAction"
+		class="cn.com.ite.hnjtamis.client.ClientFileListAction"
+		scope="prototype">
+		<property name="service" ref="clientFileService" />
+	</bean>
+	<bean id="ClientFileFormAction"
+		class="cn.com.ite.hnjtamis.client.ClientFileFormAction"
+		scope="prototype">
+		<property name="service" ref="clientFileService" />
+	</bean>
+	<bean id="clientFileService"
+		class="cn.com.ite.hnjtamis.client.ClientFileServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="clientFileDao" />
+	</bean>
+	<bean id="clientFileDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass" value="cn.com.ite.hnjtamis.client.domain.ClientFile" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		             select t.id as id,t.fileName as fileName,t.fileSize as fileSize,
+		              t.filePath as filePath,t.uploadTime as uploadTime,t.lastUpdateTime as lastUpdateTime,
+		              t.fileVersion as fileVersion,t.isRecoverVer as isRecoverVer
+		             from ClientFile t 
+		              order by t.uploadTime desc
+		            ]]></value>
+				</entry>
+				<entry key="queryByFileName">
+					<value>
+		            <![CDATA[
+		             from ClientFile t 
+		              where t.fileName = :fileName
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

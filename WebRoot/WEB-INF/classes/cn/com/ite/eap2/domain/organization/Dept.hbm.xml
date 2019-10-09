@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.organization.Dept" table="DEPT">
+        <comment>部门{'unique':{'codeUnique':'同一机构下部门编码重复！','nameUnique':'同一层次下部门名称重复！','aliasUnique':'同一层次下部门别名重复！'}}</comment>
+        <id name="deptId" type="java.lang.String">
+            <column name="DEPT_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="deptName" type="java.lang.String">
+            <column name="DEPT_NAME" length="64">
+                <comment>部门名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <many-to-one name="dept" class="cn.com.ite.eap2.domain.organization.Dept" fetch="select">
+            <column name="PARENT_DEPT_ID" length="64">
+                <comment>部门_部门编号{'unique':[{name:'nameUnique',self:false},{name:'aliasUnique',self:false}]}</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="organ" class="cn.com.ite.eap2.domain.organization.Organ" fetch="select">
+            <column name="ORGAN_ID" length="64">
+                <comment>机构{'unique':['codeUnique','nameUnique','aliasUnique']}</comment>
+            </column>
+        </many-to-one>
+        <property name="deptCode" type="java.lang.String">
+            <column name="DEPT_CODE" length="64">
+                <comment>部门编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="deptAlias" type="java.lang.String">
+            <column name="DEPT_ALIAS" length="64">
+                <comment>部门别名{'unique':['aliasUnique']}</comment>
+            </column>
+        </property>
+        <property name="deptType" type="java.lang.String">
+            <column name="DEPT_TYPE" length="64">
+                <comment>部门类型</comment>
+            </column>
+        </property>
+        <property name="deptCharacter" type="java.lang.String">
+            <column name="DEPT_CHARACTER" length="64">
+                <comment>部门性质</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>序号</comment>
+            </column>
+        </property>
+        <property name="validation" type="boolean">
+            <column name="IS_VALIDATION">
+                <comment>是否有效</comment>
+            </column>
+        </property>
+        <property name="levelCode" type="java.lang.String">
+            <column name="LEVEL_CODE" length="64">
+                <comment>级别编码</comment>
+            </column>
+        </property>
+        <property name="remark" type="java.lang.String">
+            <column name="REMARK" length="400">
+                <comment>备注</comment>
+            </column>
+        </property>
+        <bag name="deptRoles" table="dept_role" inverse="false" lazy="true">
+            <key>
+                <column name="DEPT_ID" length="64">
+                    <comment>部门角色</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.power.SysRole" column="ROLE_ID"/>
+        </bag>
+        <bag name="quarters" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="DEPT_ID" length="64">
+                    <comment>部门岗位</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Quarter" />
+        </bag>
+        <bag name="depts" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="PARENT_DEPT_ID" length="64">
+                    <comment>下级部门</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Dept" />
+        </bag>
+        <bag name="employees" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="DEPT_ID" length="64">
+                    <comment>包含员工</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Employee" />
+        </bag>
+    </class>
+</hibernate-mapping>

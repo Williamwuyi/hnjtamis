@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<!--全局配置,class目录下config.properties-->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:config.properties" />
+	</bean>
+	<!-- 数据源 -->
+	<bean id="dataSource"
+		class="cn.com.ite.eap2.core.hibernate.DriverMangerDataSource">
+		<!-- 指定连接数据库的驱动 -->
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<!-- 指定连接数据库的用户名 -->
+		<property name="username" value="${jdbc.username}" />
+		<!-- 指定连接数据库的密码 -->
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	<!--oracle数据库的分页处理和查询记录个数处理-->
+	<bean id="oraclePagingHandler"
+		class="cn.com.ite.eap2.core.hibernate.OraclePagingHandler"/>
+	<!-- hibernate拦截器 -->
+    <bean id="hibernateIntercept" class="cn.com.ite.eap2.log.HibernateIntercept">
+         <property name="noLogEntityUrls">
+               <list>
+                  <value>cn.com.ite.eap2.domain.baseinfo.LogMain</value>
+                  <value>cn.com.ite.eap2.domain.baseinfo.LogData</value>
+                  <value>cn.com.ite.eap2.domain.baseinfo.LogSub</value>
+                  <value>cn.com.ite.eap2.domain.baseinfo.LogForign</value>
+                  <value>cn.com.ite.eap2.domain.funres.MenuRecord</value>
+                  
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ThemeBankPost</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ThemeBankProfession</value>
+                  
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.Theme</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ThemeInBank</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ThemeAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ThemeSearchKey</value>   
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.Testpaper</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperTheme</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperThemeAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperShare</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperThemetype</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamArrange</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamExamroot</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamMarkpeople</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamMarkpeopleInfo</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamMarkTheme</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamProctor</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamProctorDeduct</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamPublic</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamPublicSearchkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamPublicUser</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamRoot</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamTestpaper</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamUserAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperShare</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.Exam</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.TestpaperSkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamSkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamUserTestpaper</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamMarkpeople</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamExamroot</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamTestpaperTheme</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamTestpaperAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.ExamTestpaperSearchkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyTestpaper</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyTestpaperAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyTestpaperTheme</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyTestpaperThemeSign</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyUserAnswerkey</value>
+                  <value>cn.com.ite.hnjtamis.exam.hibernatemap.StudyUserAnswerkeyHis</value>
+               </list>
+        </property>
+    </bean> 
+	<!-- hibernate session Factory -->
+	<bean id="sessionFactory"
+		class="cn.com.ite.eap2.core.hibernate.EapLocalSessionFactoryBean">
+		<!-- <property name="lobHandler" ref="oracleLobHandler"/> -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 是否自动创建数据库 -->
+		<!--<property name="schemaUpdate"><value>true</value></property>-->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 数据库方言 -->
+				<prop key="hibernate.dialect">${jdbc.dialect}</prop>
+				<prop key="hibernate.current_session_context_class">
+					org.springframework.orm.hibernate4.SpringSessionContext
+				</prop>
+				<!-- 是否输出SQL语句 -->
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- 将SQL脚本进行格式化后再输出 -->
+				<prop key="hibernate.format_sql">false</prop>
+				<!-- 是否自动创建数据库 -->
+				<!--<prop key="hibernate.hbm2dll.auto">update</prop>-->
+				<prop key="hibernate.connection.pool_size">30</prop>
+				<prop key="connection.useUnicode">true</prop>
+				<prop key="connection.characterEncoding">GBK</prop>
+				<prop key="hibernate.jdbc.batch_size">25</prop>
+				<!--
+					<prop key="hibernate.generate_statistics">true</prop>
+					<prop key="hibernate.cache.use_structured_entries">true</prop> 
+					<prop key="hibernate.cache.use_second_level_cache">true</prop>-->
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.EhCacheProvider
+				</prop>
+				<!-- <prop key="hibernate.query.factory_class">
+					org.hibernate.hql.classic.ClassicQueryTranslatorFactory
+					</prop>-->
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+			</props>
+		</property>
+		<property name="entityInterceptor">   
+           <ref bean="hibernateIntercept"/>  
+         </property>  
+		<!--<property name="mappingJarLocations">
+			<list>
+				<value>WEB-INF/lib/ite-eap2.jar</value>
+			</list>
+		</property>-->
+		<property name="mappingLocations">
+			<list>
+				<value>classpath:cn/com/ite/**/*.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	<!-- Spring的数据访问异常转换器
+    <bean id="jdbcExceptionTranslator"
+          class="org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>-->
+    <!-- hibernateTemplate -->
+    <bean id="template" class="org.springframework.orm.hibernate4.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+	<!-- 声明一个Hibernate4事务管理器供代理类自动管理事务用-->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 事物通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="create*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="merge*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="remove*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="put*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="use*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="import*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="start*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="next*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="undo*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="canel*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="level*" propagation="REQUIRED" rollback-for="Exception"/>
+			<!--hibernate4必须配置为开启事务 否则getCurrentSession()获取不到-->
+			<tx:method name="get*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="count*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="find*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="list*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="query*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="*" propagation="REQUIRED" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config expose-proxy="true" >
+		<!-- 只对业务逻辑层实施事务 -->
+		<aop:pointcut id="txPointcut"
+			expression="execution(* cn.com.ite..*Service.*(..)) or execution(* cn.com.ite.eap2.log.EapLogImpl.*(..)) or execution(* cn.com.ite.workflow.face.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>
+	<bean id="logImpl" class="cn.com.ite.eap2.log.EapLogImpl">
+        <property name="dao" ref="logDao" />
+    </bean>
+    <bean id="logDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.baseinfo.LogMain"/>
+		    <property name="sqlMap">
+		        <map>
+		            <entry key="findNewDataSql"><value><![CDATA[
+		            select a.* from log_data a, log_main b
+					 where b.log_id = a.main_id
+					   and a.data_key = :keyTerm
+					   and a.data_code = :codeTerm
+					   and a.log_year = :yearTerm
+					   and b.log_year = :yearTerm
+					 order by a.log_year desc,a.log_month desc
+		            ]]></value></entry>
+		            <entry key="querySql"><value><![CDATA[
+		            select t.* from log_main t
+					 where (t.user_name like '%' || :userTerm || '%' or
+					       t.employee like '%' || :userTerm || '%' or :userTerm is null)
+					   and t.log_year = :yearTerm and t.log_month = :monthTerm 
+					   and t.log_day >= :dayStartTerm and t.log_day<=:dayEndTerm
+					   and (t.log_type = :typeTerm or :typeTerm = 0)
+					   and (t.log_content like '%' || :contentTerm || '%' or t.log_content is null)
+					   and (t.app like '%' || :appTerm || '%' or t.app is null)
+					   and (t.module_name like '%' || :moduleTerm || '%' or t.module_name is null)
+					 order by t.log_day desc,t.log_time desc
+		            ]]></value></entry>
+		            <entry key="findSql"><value><![CDATA[
+		            select a.data_operater_type oper,a.data_name,b.att_name,
+					       b.att_value,b.att_type,c.ld_name,c.ob_id
+					  from log_data a, log_sub b, log_forign c
+					 where a.ld_id = b.dp_id and b.att_type <> 0 and b.ls_id = c.ls_id(+) 
+					   and a.ld_id = :idTerm 
+					   and b.log_month = a.log_month and b.log_year = a.log_year
+					   and c.log_month = a.log_month and c.log_year = a.log_year
+					   and a.log_month = :monthTerm and a.log_year = :yearTerm
+					 order by a.order_no, b.order_no
+		            ]]></value></entry>
+		        </map>
+		    </property>
+		</bean>
+		<bean id="LogListAction" class="cn.com.ite.eap2.log.LogListAction" scope="prototype" >
+		    <property name="service" ref="logImpl" />
+		</bean>
+		<bean id="LogFormAction" class="cn.com.ite.eap2.log.LogFormAction" scope="prototype" >
+		    <property name="service" ref="logImpl" />
+		</bean>
+		
+		
+		
+		<!--  redis缓存  -->
+	    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+	        <property name="maxIdle" value="${redis.maxIdle}"/>
+	        <property name="maxTotal" value="${redis.maxTotal}"/>
+	        <property name="maxWaitMillis" value="${redis.maxWaitMillis}" />
+	        <property name="testOnBorrow" value="${redis.testOnBorrow}"/>
+	    </bean>
+	
+	    <bean id="eapRedisConnectionFactory" class="cn.com.ite.eap2.core.redis.EapRedisConnectionFactory">
+	        <property name="hostName" value="${redis.host}"/>
+	        <property name="port" value="${redis.port}"/>
+	        <property name="password" value="${redis.password}"/>
+	        <property name="database" value="${redis.database}"/>
+	        <property name="timeout" value="${redis.timeout}"/>
+	        <property name="poolConfig" ref="poolConfig"/>
+	    </bean>
+	    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+	        <property name="connectionFactory"   ref="eapRedisConnectionFactory" />
+	    </bean>
+	    <bean id="redisDefaultDAO" class="cn.com.ite.eap2.core.redis.RedisDefaultDAOImpl" scope="prototype">
+		   <property name="redisTemplate" ref="redisTemplate" />
+		</bean>
+		 <bean id="redisDefaultService" class="cn.com.ite.eap2.core.service.DefaultRedisServiceImpl" scope="prototype">
+		   <property name="redisDao" ref="redisDefaultDAO" />
+		</bean>
+		<!--  redis缓存   -->
+</beans>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="WorkFlowListAction" class="cn.com.ite.workflow.manger.WorkFlowListAction" scope="prototype" >
+		    <property name="service" ref="workflowServer" />
+		</bean>
+		<bean id="WorkFlowFormAction" class="cn.com.ite.workflow.manger.WorkFlowFormAction" scope="prototype" >
+		    <property name="service" ref="workflowServer" />
+		</bean>
+		<bean id="FlowTestAction" class="cn.com.ite.workflow.manger.FlowTestAction" scope="prototype" >
+		    <property name="service" ref="workflowServer" />
+		</bean>
+		<bean id="workflowServer" class="cn.com.ite.workflow.manger.WorkFlowServiceImpl" scope="prototype">
+		    <property name="dao" ref="workflowDao" />
+		</bean>
+		<bean id="workflowDao" class="cn.com.ite.workflow.manger.WorkFlowDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.workflow.domain.WorkFlow"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		            from WorkFlow a where a.code like '%'||:codeTerm||'%' and a.name like '%'||:nameTerm||'%'
+		               and (:isNew = false or a.version=(select max(b.version) from WorkFlow b where b.code = a.code))
+		               order by a.name,a.version desc
+		            ]]></value>
+		            </entry>
+		            <entry key="toHql">
+		            <value>
+		            <![CDATA[
+		            from WorkFlowTo a where a.srcNode.workFlow.flowId=:flowId or a.toNode.workFlow.flowId=:flowId
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="useHql">
+		            <value>
+		            <![CDATA[
+		            select count(a) from WorkFlowExcute a where a.workFlowNode.workFlow.flowId=:flowId
+		            ]]></value>
+		            </entry>
+		            <entry key="heightVersionHql">
+		            <value>
+		            <![CDATA[
+		            select max(a.version) from WorkFlow a where a.code=:code
+		            ]]></value>
+		            </entry>
+		            <entry key="byCodeHeightVersionHql"><!--查询流程，按版本倒序-->
+		            <value>
+		            <![CDATA[
+		            from WorkFlow a where a.code=:code order by a.version desc
+		            ]]></value>
+		            </entry>
+		            <entry key="employeeByQuarterHql">
+		            <value>
+		            <![CDATA[
+		            from Employee a where a.quarter.quarterId=:quarterId
+		            ]]></value>
+		            </entry>
+		            <entry key="signTaskHql"><!--查询会签任务-->
+		            <value>
+		            <![CDATA[
+		            select b from WorkFlowExcute a,WorkFlowExcute b where a.excuteId=:excuteId and a.busId=b.busId and b.workFlowNode.nodeId=:nodeId
+		            and a.orderNo=b.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="joinCompletCountHql"><!--查询聚合结点的入口结点执行数量-->
+		            <value>
+		            <![CDATA[
+		            select a from WorkFlowTo a join WorkFlowExcute b on a.srcNode=b.workFlowNode 
+		            where a.toNode.nodeId=:toNodeId and b.busId=:flowInstanceId and b.workFlowTo.toNode=a.toNode
+		            ]]></value>
+		            </entry>
+		            <entry key="joinToHql"><!--查询已经存在聚合出口执行-->
+		            <value>
+		            <![CDATA[
+		            from WorkFlowExcute a where a.workFlowNode.nodeId=:nodeId and a.busId=:flowInstanceId
+		            ]]></value>
+		            </entry>
+		            <entry key="parentFlowHql"><!--查询始点为子流程的结点执行-->
+		            <value>
+		            <![CDATA[
+		            from WorkFlowExcute a where a.workFlowNode.code=:nodeCode and a.busId=:flowInstanceId
+		            ]]></value>
+		            </entry>
+		            <entry key="excuteInLateHql"><!--查询结点最近的执行入口-->
+		            <value>
+		            <![CDATA[
+		            from WorkFlowExcute a where a.workFlowTo.toNode.nodeId=:nodeId and a.busId=:flowInstanceId and a.orderNo=:no
+		            ]]></value>
+		            </entry>
+		            <entry key="findStateMapHql"><!--根据流程编码查询状态映射-->
+		            <value>
+		            <![CDATA[
+		            from WorkFlowTo a where a.srcNode.workFlow.code=:code
+		            ]]></value>
+		            </entry>
+		            <entry key="findCreateManHql"><!--根据流程创建者-->
+		            <value>
+		            <![CDATA[
+		            select a.employeeId as employeeId,a.employeeName as employeeName from WorkFlowExcute a where a.busId=:flowInstanceId and a.orderNo=1 and a.workFlowNode.type='START'
+		            ]]></value>
+		            </entry>
+		            <entry key="findWorkNodeByCodeFlowId">
+		            <value>
+		            <![CDATA[
+		            from WorkFlowNode a where a.workFlow.flowId=:flowId and a.code=:nodeCode
+		            ]]></value>
+		            </entry>
+		            <entry key="findPopdomNodeHql">
+		            <value>
+		            <![CDATA[
+		            select distinct a.workFlowNode from WorkFlowExcute a
+		            where a.workFlowNode.workFlow.code=:flowCode and a.workFlowTo is null
+		              and (a.employeeId=:employeeId or a.quarterId=:quarterId)
+		            ]]></value>
+		            </entry>
+		            <entry key="findTimeOutNoExcuteTaskHql">
+		            <value>
+		            <![CDATA[
+		            from WorkFlowExcute a
+		            where a.planTime>=sysdate and  a.workFlowTo is null
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		     <property name="sqlMap">
+		        <map>
+		            <entry key="deleteNoTo"><!--删除没有关联的导向-->
+		            <value>
+		            <![CDATA[
+		            select a.* from work_flow_to a where a.src_node_id in
+                                (select w.node_id from work_flow_node w where w.work_id = :flowId)
+		            ]]></value>
+		            </entry>
+		            <entry key="stateSql"><!--根据任务实例ID查询状态，包括并发状态-->
+		            <value>
+		            <![CDATA[
+		            select distinct k.code as code,k.state as name from (select d.code,d.state 
+		              from work_flow_excute a,work_flow_excute b,work_flow_excute c,work_flow_to d
+                     where a.bus_id=b.bus_id and b.bus_id=c.bus_id and b.excute_id=:excuteId and b.if_undo=0
+                       and a.to_id = d.to_id and d.to_node_id=c.node_id and a.if_undo=0 and c.if_undo=0
+                       and c.to_id is null order by d.order_no)k
+		            ]]></value>
+		            </entry>
+		            <entry key="stateNodeSql"><!--根据任务实例ID查询状态,只是结点状态，非并发状态-->
+		            <value>
+		            <![CDATA[
+		            select distinct k.code as code,k.state as name from (select d.code,d.state from work_flow_excute a,work_flow_excute b,work_flow_to d
+                     where a.bus_id=b.bus_id and b.excute_id=:excuteId
+                       and a.to_id = d.to_id and d.to_node_id=b.node_id and a.if_undo=0 and b.if_undo=0 order by d.order_no)k
+		            ]]></value>
+		            </entry>
+		            <entry key="flowMonitorSql"><!--流程监控SQL-->
+		            <value>
+		            <![CDATA[
+		            select k.* from (
+                        select e.bus_id busId,--流程执行ID
+                               max(f.name) flowName,--业务名称
+                               max(f.code) flowCode,--流程编码
+                               max((select p.param_value from work_flow_excute_param p 
+                                     where p.param_key='id' and p.excute_id=e.excute_id)) funId,--业务ID
+                               max(n.url) url,--业务地址
+                               max((select p.param_value from work_flow_excute_param p 
+                                     where p.param_key='title' and p.excute_id=e.excute_id)) flowTitle,--业务标题
+                               max((case when e.order_no=1 then e.employee_name end)) creater,--创建人
+                               max((case when e.order_no=1 then e.employee_id end)) createrId,--创建人Id
+                               max((case when e.order_no=1 then e.create_time end)) createTime,--创建时间
+                               max((case when e.to_id is null then e.create_time end)) lastTime,--最近执行时间
+                               max((case when n.type='END' then e.create_time end)) endTime--结束时间
+                         from work_flow_excute e,work_flow_node n,work_flow f
+                        where e.node_id=n.node_id and n.work_id=f.flow_id
+                        group by e.bus_id) k 
+                     where (k.createrId = :createId or :createId is null)
+                       and (flowCode =:flowCode or :flowCode is null)
+                       and (k.createTime>:startDate or :startDate is null)
+                       and (k.endTime is null or k.endTime<=:endDate or :endDate is null)
+                       and (exists (select w.excute_id from work_flow_excute w where w.bus_id=k.busId and w.employee_name like '%'||:man||'%') 
+                            or :man is null or k.creater like '%'||:man||'%')
+                       and ((:complet=1 and k.endTime is not null) or :complet=-1 or (:complet=0 and k.endTime is null))
+                     order by k.createTime desc
+		            ]]></value>
+		            </entry>
+		            <entry key="findInMan"><!--查询参与者-->
+		            <value>
+		            <![CDATA[
+		              select k.employee_name,k.task_name,k.to_id from work_flow_excute k where k.bus_id=:busId
+                      and k.task_name not in ('开始','结束')
+                      order by k.create_time
+		            ]]></value>
+		            </entry>
+		        </map>
+		     </property>
+		</bean>
+</beans>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="jobpromotion" extends="eap-default" namespace="/jobstandard/promotion">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+            	<param name="includeProperties">total,list\[\d+\]\.[A-Za-z0-9_]+,
+            	list\[\d+\]\.thisquarter.quarterId,list\[\d+\]\.thisquarter.quarterName</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                	form.thisquarter.quarterId,form.thisquarter.quarterName,
+                	form.promoteQuarters\[\d+\]\.quarterId,form.promoteQuarters\[\d+\]\.quarterName</param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="tree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

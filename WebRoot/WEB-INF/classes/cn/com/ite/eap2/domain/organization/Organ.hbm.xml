@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.organization.Organ" table="ORGAN">
+        <comment>机构{'unique':{'codeUnique':'机构编码重复！','nameUnique':'机构名称重复！','aliasUnique':'机构别名重复！'}}</comment>
+        <id name="organId" type="java.lang.String">
+            <column name="ORGAN_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="organName" type="java.lang.String">
+            <column name="ORGAN_NAME" length="64">
+                <comment>名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <many-to-one name="organ" class="cn.com.ite.eap2.domain.organization.Organ" fetch="select">
+            <column name="PARENT_ORGAN_ID" length="64">
+                <comment>关联机构（同批人不同牌子）（</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="linkOrgan" class="cn.com.ite.eap2.domain.organization.Organ" fetch="select">
+            <column name="LINK_ORGAN_ID" length="64">
+                <comment>父机构</comment>
+            </column>
+        </many-to-one>
+        <property name="area" type="java.lang.String">
+            <column name="AREA" length="200">
+                <comment>地区</comment>
+            </column>
+        </property>
+        <property name="organCode" type="java.lang.String">
+            <column name="ORGAN_CODE" length="64">
+                <comment>编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="organAlias" type="java.lang.String">
+            <column name="ORGAN_ALIAS" length="64">
+                <comment>别名{'unique':['aliasUnique']}</comment>
+            </column>
+        </property>
+        <property name="organType" type="java.lang.String">
+            <column name="ORGAN_TYPE" length="64">
+                <comment>机构类型</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>序号</comment>
+            </column>
+        </property>
+        <property name="postcode" type="java.lang.Long">
+            <column name="POSTCODE" precision="10" scale="0">
+                <comment>邮编</comment>
+            </column>
+        </property>
+        <property name="address" type="java.lang.String">
+            <column name="ADDRESS" length="100">
+                <comment>地址</comment>
+            </column>
+        </property>
+        <property name="telephone" type="java.lang.String">
+            <column name="TELEPHONE" length="64">
+                <comment>单位电话</comment>
+            </column>
+        </property>
+        <property name="fax" type="java.lang.String">
+            <column name="FAX" length="64">
+                <comment>传真</comment>
+            </column>
+        </property>
+        <property name="validation" type="boolean">
+            <column name="IS_VALIDATION">
+                <comment>是否有效</comment>
+            </column>
+        </property>
+        <property name="remark" type="java.lang.String">
+            <column name="REMARK" length="500">
+                <comment>备注</comment>
+            </column>
+        </property>
+        <property name="levelCode" type="java.lang.String">
+            <column name="LEVEL_CODE" length="64">
+                <comment>级别编码</comment>
+            </column>
+        </property>
+        <property name="sysParemeter" type="java.lang.String">
+            <column name="SYS_PARAMETER" length="64">
+                <comment>系统按时</comment>
+            </column>
+        </property>
+        <property name="bankMapCode" type="java.lang.String">
+            <column name="BANK_MAP_CODE" length="100">
+                <comment>题库关联映射编码</comment>
+            </column>
+        </property>
+        <bag name="organMangers" inverse="false" table="ORGAN_MANGER" lazy="true">
+            <key>
+                <column name="ORGAN_ID" length="64">
+                    <comment>机构管理员</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.power.SysUser" column="USER_ID" />
+        </bag>
+        <bag name="organs" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="PARENT_ORGAN_ID" length="64">
+                    <comment>子机构</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Organ" />
+        </bag>
+        <bag name="depts" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="ORGAN_ID" length="64">
+                    <comment>下级部门</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Dept" />
+        </bag>
+        <bag name="users" inverse="false" lazy="true">
+            <key>
+                <column name="ORGAN_ID" length="64">
+                    <comment>机构用户</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.power.SysUser" />
+        </bag>
+    </class>
+</hibernate-mapping>

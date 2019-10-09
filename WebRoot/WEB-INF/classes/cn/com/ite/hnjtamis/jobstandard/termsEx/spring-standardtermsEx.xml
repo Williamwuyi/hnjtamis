@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="StandardTermsExportExcelAction" class="cn.com.ite.hnjtamis.jobstandard.termsEx.StandardTermsExportExcelAction" scope="prototype" >
+		    <property name="service" ref="standardtermsExServer" />
+		</bean>
+		<bean id="StandardTermsExListAction" class="cn.com.ite.hnjtamis.jobstandard.termsEx.StandardTermsExListAction" scope="prototype" >
+		    <property name="service" ref="standardtermsExServer" />
+		</bean>
+		<bean id="StandardTermsExFormAction" class="cn.com.ite.hnjtamis.jobstandard.termsEx.StandardTermsExFormAction" scope="prototype" >
+		    <property name="service" ref="standardtermsExServer" />
+		</bean>
+		<bean id="standardtermsExServer" class="cn.com.ite.hnjtamis.jobstandard.termsEx.StandardTermsExServiceImpl" scope="prototype">
+		    <property name="dao" ref="standardtermsExDao" />
+		</bean>
+		<bean id="standardtermsExDao" class="cn.com.ite.hnjtamis.jobstandard.termsEx.StandardTermsExDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.jobstandard.domain.StandardTerms"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from StandardTerms t where (:nameTerm is null or standardname like '%'||:nameTerm||'%' )
+		             and (:typenameTerm is null or t.standardTypes.jstypeid = :typenameTerm)
+		             and (:parentNameTerm is null or t.standardTypes.parentSpeciltype.jstypeid = :parentNameTerm)
+		             and t.standardid in (
+		                 select v.standardTerms.standardid from JobsUnionStandard v where  (v.jobscode = :quarterIdTerm or :quarterIdTerm is null))
+		             and  t.standardid in (
+		                 select v.standardTerms.standardid from JobsStandardQuarter v where  (v.quarterTrainCode = :quarterStandardIdTerm or :quarterStandardIdTerm is null))
+		             and t.status<>3
+		             order by orderno,standardname
+		            ]]></value>
+		            </entry>
+		           
+		            <entry key="queryTreeHql">
+		            <value>
+		            <![CDATA[
+		             from StandardTypes t where 
+		              t.status <> 3
+		             and t.isavailable <> 0
+		             order by t.orderno
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryTopStandardTypesHql">
+		            <value>
+		            <![CDATA[
+		             from StandardTypes t where 
+		              t.status <> 3
+		             and t.isavailable <> 0
+		             and t.parentSpeciltype is null
+		             order by t.orderno
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryStandardTermsByParentTypeId">
+		            <value>
+		            <![CDATA[
+		             from StandardTerms t where 
+		              t.standardTypes.parentSpeciltype.jstypeid = :typeId
+		              and t.isavailable <> 0
+		             order by t.orderno
+		            ]]></value>
+		            </entry>
+		            <entry key="queryStandardTermsByTypeId">
+		            <value>
+		            <![CDATA[
+		             from StandardTerms t where 
+		              t.standardTypes.jstypeid = :typeId
+		              and t.isavailable <> 0
+		             order by t.orderno
+		            ]]></value>
+		            </entry>
+		            <entry key="queryStandardTermQuarterByStandardId">
+		            <value>
+		            <![CDATA[
+		             from JobsStandardQuarter t where 
+		              t.standardTerms.standardid = :standardid
+		              and t.standardTerms.isavailable <> 0
+		             order by t.standardTerms.orderno,t.orderno
+		            ]]></value>
+		            </entry>
+		            <entry key="queryStandardTermQuarterByPublicId">
+		            <value>
+		            <![CDATA[
+		             from  ExamPublicSearchkey t where t.quarterTrainCode is not null
+		             and t.examPublic.publicId = :publicId
+		            ]]></value>
+		            </entry>
+		             <entry key="queryAllStandardTermQuarter">
+		            <value>
+		            <![CDATA[
+		             from JobsStandardQuarter t where 
+		               t.standardTerms.isavailable <> 0
+		             order by t.standardTerms.orderno,t.orderno
+		            ]]></value>
+		            </entry>
+		             <entry key="quarterStandardHql">
+		            <value>
+		            <![CDATA[
+		             from QuarterStandard t where t.belongType='10' order by t.sortNum,t.quarterCode
+		            ]]></value>
+		            </entry>
+		            <entry key="quarterStandardAllHql">
+		            <value>
+		            <![CDATA[
+		             from QuarterStandard t  order by t.sortNum,t.quarterCode
+		            ]]></value>
+		            </entry>
+		            <entry key="quarterStandardOrganHql">
+		            <value>
+		            <![CDATA[
+		             from QuarterStandard t where t.belongType='10' or (t.belongType='20' and t.organId = :organId) order by t.sortNum,t.quarterCode
+		            ]]></value>
+		            </entry>
+		             <entry key="quarterStandardOnlyOrganHql">
+		            <value>
+		            <![CDATA[
+		             from QuarterStandard t where t.belongType='20' and t.organId = :organId order by t.sortNum,t.quarterCode
+		            ]]></value>
+		            </entry>
+		            <entry key="queryJobsUnionStandardNotAvailable">
+		            <value>
+		            <![CDATA[
+		             from JobsUnionStandard t where t.isavailable = 0 and t.standardTerms.standardid = :standardid
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   
+		   <property name="sqlMap">
+		        <map>
+		        	
+		        </map>
+		    </property>
+		    
+		</bean>
+</beans>

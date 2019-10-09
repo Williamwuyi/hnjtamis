@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.workflow.domain.WorkFlowTo" table="WORK_FLOW_TO">
+        <comment>工作流结点导向</comment>
+        <id name="toId" type="java.lang.String">
+            <column name="TO_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="srcNode" class="cn.com.ite.workflow.domain.WorkFlowNode" fetch="select">
+            <column name="SRC_NODE_ID" length="64">
+                <comment>源结点</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="toNode" class="cn.com.ite.workflow.domain.WorkFlowNode" fetch="select">
+            <column name="TO_NODE_ID" length="64">
+                <comment>目的结点</comment>
+            </column>
+        </many-to-one>
+        <property name="code" type="java.lang.String">
+            <column name="CODE" length="64">
+                <comment>导向编码</comment>
+            </column>
+        </property>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" length="64">
+                <comment>导向名称</comment>
+            </column>
+        </property>
+        <property name="state" type="java.lang.String">
+            <column name="STATE" length="64">
+                <comment>状态名称</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>顺序码</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

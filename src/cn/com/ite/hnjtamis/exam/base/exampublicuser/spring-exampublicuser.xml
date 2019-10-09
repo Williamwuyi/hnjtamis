@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ExamPublicUserListAction" class="cn.com.ite.hnjtamis.exam.base.exampublicuser.ExamPublicUserListAction" scope="prototype" >
+		    <property name="service" ref="examPublicUserServer" />
+		    <property name="organService" ref="organServer" />
+		    <property name="deptService" ref="deptServer" />
+		    <property name="quarterService" ref="quarterServer" />
+		    <property name="examPublicService" ref="examPublicServer" />
+		</bean>
+		<bean id="ExamPublicUserFormAction" class="cn.com.ite.hnjtamis.exam.base.exampublicuser.ExamPublicUserFormAction" scope="prototype" >
+		    <property name="service" ref="examPublicUserServer" />
+		    <property name="examPublicService" ref="examPublicServer" />
+		</bean>
+		<bean id="examPublicUserServer" class="cn.com.ite.hnjtamis.exam.base.exampublicuser.service.ExamPublicUserServiceImpl" scope="prototype">
+		    <property name="dao" ref="examPublicUserDao" />
+		</bean>
+		<bean id="examPublicUserDao" class="cn.com.ite.hnjtamis.exam.base.exampublicuser.dao.ExamPublicUserDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.ExamPublicUser"/>
+		    <property name="hqlMap">
+		        <map>
+		        	<entry key="queryUserPwdAndLoginNumHql">
+			            <value>
+				            <![CDATA[
+				             from ExamUserTestpaper t where t.examPublicUser.userId =:userId order by t.creationDate
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryHql">
+			            <value>
+				            <![CDATA[
+				             from ExamPublicUser t where  t.examPublic.examTitle like '%'||:titleTerm||'%'
+				             and (t.examPublic.publicId = :publicIdTerm  or :publicIdTerm is null)
+				             and (t.employeeId = :employeeIdTerm or :employeeIdTerm is null)
+				             and (substr(t.examPublic.examStartTime,0,10) >= :startTerm or :startTerm is null)
+				             and (substr(t.examPublic.examEndTime,0,10) <= :endTerm or :endTerm is null)
+				             and (t.state = :stateTerm or :stateTerm is null)
+				             and (t.userName = :userNameTerm or :userNameTerm is null)
+				             and (t.bmType = :bmTypeTerm or :bmTypeTerm is null)
+				             and (
+					             	 ('0'=:passDeadLineTerm  and to_char(sysdate,'yyyy-mm-dd') < t.examPublic.examEndTime )
+					                  or ('1'=:passDeadLineTerm and to_char(sysdate,'yyyy-mm-dd') > t.examPublic.examEndTime)
+					                  or ('2'=:passDeadLineTerm)
+				                  )
+				             and t.isDel = 0
+				             and (t.userOrganId = :userOrganIdTerm or :userOrganIdTerm is null)
+				             order by t.examPublic.publicTime desc,t.userOrganName,t.userName 
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryMsgHzUserHql">
+			            <value>
+				            <![CDATA[
+				             from ExamPublicUser t where  
+				             	t.examPublic.publicId = :publicIdTerm
+				             	and t.isDel = 0 
+				             order by  t.userOrganName,t.userName 
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="querySysAfficheUserInPublicIdHql">
+			            <value>
+				            <![CDATA[
+				             from SysAfficheUser t where  t.employeeId is not null and 
+				             	t.saId in( select tt.saId from SysAffiche tt where tt.relationId = :publicIdTerm
+				             	and tt.relationType = 'exmpublic') 
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            
+		            <entry key="queryExamPublicUserHql">
+			            <value>
+				            <![CDATA[
+					             from ExamPublicUser t where t.employeeId = :employeeIdTerm 
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamPublicHql">
+			            <value>
+				            <![CDATA[
+				             from ExamPublic a where 
+				              (a.examStartTime >= :startTerm or :startTerm is null)
+				              and (a.examEndTime <= :endTerm or :endTerm is null)
+				              and (a.state = :stateTerm or :stateTerm is null)
+				              and (a.examTypeId = :examTypeIdTerm or :examTypeIdTerm is null)
+				              and (
+					             	 ('0'=:passDeadLineTerm  and to_char(sysdate,'yyyy-mm-dd') < a.examEndTime )
+					                  or ('1'=:passDeadLineTerm and to_char(sysdate,'yyyy-mm-dd') > a.examEndTime)
+					                  or ('2'=:passDeadLineTerm)
+				                  )
+				              and a.isReg='0'
+				              and exists(select 1 from ExamPublicSearchkey t where t.examPublic.publicId=a.publicId and
+				                t.postId in (:termquid) )
+				             order by a.publicTime desc
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="isRegisterExam">
+			            <value>
+				            <![CDATA[
+				             from ExamPublicUser t where t.examPublic.publicId =:examPublicIdTerm
+				             and t.idNumber =:idNumberTerm
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamPublic">
+			            <value>
+				            <![CDATA[
+				             from ExamPublic t where t.publicId =:publicId
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryUserByPublicId">
+			            <value>
+				            <![CDATA[
+				             from ExamPublicUser t where t.examPublic.publicId = :examPublicIdTerm order by  t.userOrganName,t.userName 
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		             <entry key="queryUserByPublicIdAndEmpId">
+			            <value>
+				            <![CDATA[
+				             from ExamPublicUser t where t.examPublic.publicId = :examPublicId
+				             and t.employeeId = :employeeId 
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		        	<entry key="auditListSql">
+			            <value>
+				            <![CDATA[
+				            update exam_public_user t set t.state='20' where t.user_id in (:updateIds)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="findDataSql">
+			            <value>
+				            <![CDATA[
+					            select distinct a.* from dictionary a,dictionary_type b 
+					            where a.dt_id=b.dt_id and b.dt_code=:typeCode 
+					            order by a.sort_no
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryProQuaterIdsSql">
+			            <value>
+				            <![CDATA[
+					            select t.parentjobscode as PC from jobs_promotion t where t.jobscode=:quarteridId
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryIdNumbersByIdsSql">
+			            <value>
+				            <![CDATA[
+					            select t.id_number,t.public_id from exam_public_user t where 
+					            ',' || :ids || ',' like '%,' || t.user_id || ',%'
+				            ]]>
+			            </value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

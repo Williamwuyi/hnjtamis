@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="MenuListAction" class="cn.com.ite.eap2.module.funres.menu.MenuListAction" scope="prototype" >
+		    <property name="service" ref="menuServer" />
+		</bean>
+		<bean id="MenuFormAction" class="cn.com.ite.eap2.module.funres.menu.MenuFormAction" scope="prototype" >
+		    <property name="service" ref="menuServer" />
+		</bean>
+		<bean id="menuServer" class="cn.com.ite.eap2.core.service.DefaultServiceImpl" scope="prototype">
+		    <property name="dao" ref="menuDao" />
+		</bean>
+		<bean id="menuDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.funres.AppMenu"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		            select a from AppMenu a left join a.moduleResource b where a.appSystem.appId = :appTerm 
+		            and a.menuName like '%'||:nameTerm||'%' and (a.menuType = :meneTypeTerm or :meneTypeTerm is null)
+		            and (b is null or b.resourceCode like '%'||:resourceCodeTerm||'%' or :resourceCodeTerm is null)
+		            and (b is null or b.resourceName like '%'||:resourceNameTerm||'%' or :resourceNameTerm is null)
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from AppMenu t 
+		             where (t.appMenu = (select a.appMenu from AppMenu a where a.menuId=:parentId) 
+		                or (:parentId is null and t.appMenu is null)
+		                or (t.appMenu is null and (select a.appMenu from AppMenu a where a.menuId=:parentId) is null)) 
+		               and t.appSystem.appId = :appTerm
+		            order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryRecordHql">
+		            <value>
+		            <![CDATA[
+		             from MenuRecord t where t.userId=:userId and t.appMenu.appSystem.appId in (:appId,'system') order by t.orderNo,t.openTime desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryRecordByMenuHql">
+		            <value>
+		            <![CDATA[
+		             from MenuRecord t where t.userId=:userId and t.appMenu.menuId=:menuId
+		            ]]></value>
+		            </entry>
+		            <entry key="deleteMenuRecordHql">
+		            <value>
+		            <![CDATA[
+		             delete from MenuRecord a where a.appMenu.menuId=:menuId
+		            ]]></value>
+		            </entry>
+		            <entry key="queryQuickMenuHql">
+		            <value>
+		            <![CDATA[
+		              from MenuRecord a where a.userId=:userId order by a.orderNo,a.openTime desc
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

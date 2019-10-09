@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="quarter" extends="eap-default" namespace="/organization/quarter">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <param name="includeProperties">quarters.*</param>
+                <param name="excludeProperties">quarters\[\d+\]\.quarterRoles,quarters\[\d+\]\.employees</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                form.dept.deptId,form.dept.deptName,
+                form.quarter.quarterId,form.quarter.quarterName,
+                form.quarterRoles\[\d+\]\.roleId,form.quarterRoles\[\d+\]\.roleName,
+                form.quarterStandard\.[A-Za-z0-9_]+</param>
+                <param name="excludeProperties">form.quarters,form.employees</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="subList">
+                <param name="includeProperties">total,quarters\[\d+\]\.[A-Za-z0-9_]+,quarters\[\d+\]\.dept.deptId,quarters\[\d+\]\.dept.deptName</param> 
+                <param name="excludeProperties">quarters\[\d+\]\.quarterRoles,quarters\[\d+\]\.quarters,quarters\[\d+\]\.quarter,quarters\[\d+\]\.employees</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="tree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="odqtree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+             <result type="json" name="quarterStandardList">
+                <param name="root">quarterStandardList</param>
+                <param name="includeProperties"></param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

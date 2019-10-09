@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="MonthPlanListAction"
+		class="cn.com.ite.hnjtamis.train.plan.MonthPlanListAction"
+		scope="prototype">
+		<property name="service" ref="monthPlanService" />
+	</bean>
+	<bean id="MonthPlanFormAction"
+		class="cn.com.ite.hnjtamis.train.plan.MonthPlanFormAction"
+		scope="prototype">
+		<property name="service" ref="monthPlanService" />
+	</bean>
+	<bean id="monthPlanService"
+		class="cn.com.ite.hnjtamis.train.plan.MonthPlanServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="monthPlanDao" />
+	</bean>
+	<bean id="monthPlanDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass" value="cn.com.ite.hnjtamis.train.domain.MonthPlan" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		             from MonthPlan t 
+		            where (t.title like '%'||:titleTerm||'%' or :titleTerm is null)
+		                and (t.speciality.specialityid = :specialityTerm or :specialityTerm is null)
+		                and (t.dept.deptId = :deptTerm or :deptTerm is null)
+		                and (t.month = :monthTerm or :monthTerm is null)
+		                and t.syncStatus <> 3 and t.isDel = 0
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+				<entry key="queryAllHql">
+					<value>
+		            <![CDATA[
+		             from MonthPlan t
+		              where (t.status = :statusTerm or :statusTerm is null)
+		              and (t.month = :monthTerm or :monthTerm is null)
+		              and t.syncStatus <> 3 and t.isDel = 0
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

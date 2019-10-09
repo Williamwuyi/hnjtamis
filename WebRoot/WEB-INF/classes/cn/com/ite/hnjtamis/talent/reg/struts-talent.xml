@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="talent" extends="eap-default" namespace="/talent/reg">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">               
+                <param name="includeProperties">
+                total,list\[\d+\]\.[A-Za-z0-9_]+,
+                list\[\d+\]\.quarter.quarterId,list\[\d+\]\.quarter.quarterName,
+                list\[\d+\]\.organ.organId,list\[\d+\]\.organ.organName,
+                list\[\d+\]\.employee.employeeId,list\[\d+\]\.employee.employeeName
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+            	<!-- <param name="root">form</param>-->
+                <param name="includeProperties">
+                form\.[A-Za-z0-9_]+,
+                form.organ.organId,form.organ.organName,
+                form.quarter.quarterId,
+                form.quarter.quarterName,
+                form\.specialitys\[\d+\]\.speciality\.specialityid,
+                form\.specialitys\[\d+\]\.speciality\.specialityname,
+                form\.specialitys\[\d+\]\.reSpecialityId,
+                form\.specialitys\[\d+\]\.specialityname,
+                form\.specialitys\[\d+\]\.orderno,
+                form\.specialitys\[\d+\]\.toZz,
+                form\.specialitys\[\d+\]\.toFzz,
+                form.employee.employeeId,
+                form.employee.employeeName,
+                form.talentRegistrationBanks\[\d+\]\.bankId,
+                form.talentRegistrationBanks\[\d+\]\.bankName
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="treeList">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="chart">
+                <param name="root">chartList</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result name="showReport">
+                /modules/hnjtamis/talent/statistic.jsp
+            </result>
+       </action>
+    </package>
+</struts>

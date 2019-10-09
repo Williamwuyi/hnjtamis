@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 试题管理  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ThemeListAction" class="cn.com.ite.hnjtamis.exam.base.theme.ThemeListAction" scope="prototype" >
+		    <property name="service" ref="themeService" />
+		</bean>
+		<bean id="ThemeFormAction" class="cn.com.ite.hnjtamis.exam.base.theme.ThemeFormAction" scope="prototype" >
+		    <property name="service" ref="themeService" />
+		</bean>
+		<bean id="themeService" class="cn.com.ite.hnjtamis.exam.base.theme.ThemeServiceImpl" scope="prototype">
+		    <property name="dao" ref="themeDao" />
+		</bean>
+		<bean id="themeDao" class="cn.com.ite.hnjtamis.exam.base.theme.ThemeDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.Theme"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="themeForParamHql">
+		            <value>
+		            <![CDATA[
+		             from Theme a where
+		             ( a.themeName like '%' || :themeNameTerm || '%' or :themeNameTerm is null )
+		             and (a.state = :stateTerm or :stateTerm is null)
+		             and (a.themeType.themeTypeId = :themeTypeIdTerm or :themeTypeIdTerm is null )
+		             and (:specialityIdTerm is null  or exists ( 
+		           		 			select 1 from ThemeInBank b  where b.theme.themeId = a.themeId  
+		           		 					and exists(select 1 from ThemeBankProfession p 
+		           		 						where p.themeBank.themeBankId = b.themeBank.themeBankId and p.speciality.specialityid = :specialityIdTerm)
+		           		 						))
+		             and (a.writeUser like '%' || :writeUserTerm || '%' or :writeUserTerm is null )
+		             and (a.degree = :degreeTerm or :degreeTerm is null )
+		             and (a.knowledgePoint like '%' || :knowledgePointTerm || '%' or :knowledgePointTerm is null )   
+		             and (:themeBankIdTerm is null or exists(select 1 from ThemeInBank b 
+		                    where b.theme.themeId = a.themeId and ',' || :themeBankIdTerm || ',' like '%,' || b.themeBank.themeBankId || ',%'))
+		             order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryThemeTypeListHql">
+		            <value>
+		            <![CDATA[
+		             from ThemeType a where a.isUse = 10 order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryThemeBankListByIdsHql">
+		            <value>
+		            <![CDATA[
+		             from ThemeBank a where :themeBankIds like '%,'  || a.themeBankId || ',%' 
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryThemeByIdsHql">
+		            <value>
+		            <![CDATA[
+		             from Theme a where :themeIds like '%,'  || a.themeId || ',%' 
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryThemeFkauditHql">
+		            <value>
+		            <![CDATA[
+		             from ThemeFkaudit a where 
+		             	   (a.createdIdBy = :employeeId or :employeeId is null)
+		             	  and ( ',' || :state || ',' like  '%,' || a.state || ',%' or :state is null)
+		             	  and a.theme.themeId = :themeId order by a.creationDate desc,a.fkType desc 
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

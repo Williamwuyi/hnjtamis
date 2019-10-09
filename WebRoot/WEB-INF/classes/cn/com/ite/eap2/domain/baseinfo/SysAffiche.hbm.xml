@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.SysAffiche" table="SYS_AFFICHE">
+        <comment>系统公告</comment>
+        <id name="saId" type="java.lang.String">
+            <column name="SA_ID" length="64" />
+            <generator class="uuid.hex"/>
+        </id>
+        <property name="sender" type="java.lang.String">
+            <column name="SENDER" length="64">
+                <comment>发送者</comment>
+            </column>
+        </property>
+        <property name="sendTime" type="date">
+            <column name="SEND_TIME" length="20">
+                <comment>发送时间</comment>
+            </column>
+        </property>
+        <property name="title" type="java.lang.String">
+            <column name="TITLE" length="64">
+                <comment>标题</comment>
+            </column>
+        </property>
+        <property name="content" type="java.lang.String">
+            <column name="CONTENT">
+                <comment>内容</comment>
+            </column>
+        </property>
+        <property name="deadline" type="java.lang.Integer">
+            <column name="DEADLINE" precision="5" scale="0">
+                <comment>有效天数</comment>
+            </column>
+        </property>
+        <property name="accessoriesItemId" type="java.lang.String">
+            <column name="ACCESSORIES_ITEM_ID" length="64">
+                <comment>附件关联ID</comment>
+            </column>
+        </property>
+         <property name="relationId" type="java.lang.String">
+            <column name="RELATION_ID" length="64">
+                <comment>关联ID</comment>
+            </column>
+        </property>
+         <property name="relationType" type="java.lang.String">
+            <column name="RELATION_TYPE" length="64">
+                <comment>关联类型</comment>
+            </column>
+        </property>
+        <set name="accessories" inverse="false" cascade="all,delete-orphan" lazy="true" order-by="ORDER_NO"> 
+            <key>
+                <column name="ITEM_ID" length="64" not-null="true">
+                    <comment>附件标识</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.Accessory"/>  
+        </set>  
+         <bag name="sysAfficheIncepters" inverse="false" lazy="true" cascade="all,delete-orphan" order-by="SORT_NUM">
+            <key>
+                <column name="SA_ID" length="64" />
+            </key>
+           <one-to-many class="cn.com.ite.eap2.domain.baseinfo.SysAfficheIncepter"/>  
+        </bag>
+    </class>
+</hibernate-mapping>

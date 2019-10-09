@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="app" extends="eap-default" namespace="/funres/app">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">total,list\[\d+\]\.[A-Za-z0-9_]+</param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">list\[\d+\]\.homePanels.*,list\[\d+\]\.appModules.*,
+                list\[\d+\]\.appMenus.*,
+                list\[\d+\]\.systemOrgans.*,list\[\d+\]\.systemMangers.*,list\[\d+\]\.dictionaryTypes.*</param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                form.systemMangers\[\d+\]\.userId,form.systemMangers\[\d+\]\.account</param>
+                <param name="excludeProperties">form.homePanels,form.appModules,form.systemOrgans,
+                form.appMenus,form.dictionaryTypes</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result name="export" type="stream">
+                 <!--mime类型-->
+                 <param name="contentType">application/vnd.ms-excel</param>
+                 <!--attachment为提示下载或打开，inline为在IE中打开-->
+                 <param name="contentDisposition">attachment;filename="${fileName}"</param>
+                 <!--配置由那个属性获得文件流，缺省为inputStream-->
+                 <param name="inputName">inputStream</param>
+                 <!-- 指定下载文件的缓存大小-->
+                 <param name="bufferSize">2048</param>
+            </result>
+       </action>
+    </package>
+</struts>

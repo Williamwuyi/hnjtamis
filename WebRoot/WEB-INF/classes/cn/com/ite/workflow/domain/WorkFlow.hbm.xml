@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.workflow.domain.WorkFlow" table="WORK_FLOW">
+        <comment>工作流定义{'unique':{'codeUnique':'同一版本下编码重复！','nameUnique':'同一版本下名称重复！'}}</comment>
+        <id name="flowId" type="java.lang.String">
+            <column name="FLOW_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" length="64">
+                <comment>工作流名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="code" type="java.lang.String">
+            <column name="CODE" length="64">
+                <comment>工作流编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="version" type="java.lang.Integer">
+            <column name="VERSION" precision="5" scale="0">
+                <comment>版本号{'unique':['codeUnique','nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="that" type="java.lang.String">
+            <column name="THAT" length="400">
+                <comment>说明</comment>
+            </column>
+        </property>
+        <property name="pic" type="java.lang.String">
+            <column name="PIC">
+                <comment>流程图</comment>
+            </column>
+        </property>
+        <property name="serviceName" type="java.lang.String">
+            <column name="SERVICE" length="64">
+                <comment>服务名</comment>
+            </column>
+        </property>
+        <set name="workFlowNodes" cascade="all,delete-orphan" inverse="false" order-by="ORDER_NO">
+            <key>
+                <column name="WORK_ID" length="64">
+                    <comment>工作流结点定义</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.workflow.domain.WorkFlowNode" />
+        </set>
+    </class>
+</hibernate-mapping>

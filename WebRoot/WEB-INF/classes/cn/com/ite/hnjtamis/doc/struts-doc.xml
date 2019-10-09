@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<!-- Doc导出  -->
+<struts>
+    <package name="docExp" extends="eap-default" namespace="/docExp">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+       </action>
+    </package>
+</struts>

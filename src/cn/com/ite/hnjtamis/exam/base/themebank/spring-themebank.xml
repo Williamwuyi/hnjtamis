@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ThemeBankListAction" class="cn.com.ite.hnjtamis.exam.base.themebank.ThemeBankListAction" scope="prototype" >
+		    <property name="service" ref="themeBankServer" />
+		</bean>
+		<bean id="ThemeBankFormAction" class="cn.com.ite.hnjtamis.exam.base.themebank.ThemeBankFormAction" scope="prototype" >
+		    <property name="service" ref="themeBankServer" />
+		</bean>
+		<bean id="themeBankServer" class="cn.com.ite.hnjtamis.exam.base.themebank.service.ThemeBankServiceImpl" scope="prototype">
+		    <property name="dao" ref="themeBankDao" />
+		</bean>
+		<bean id="themeBankDao" class="cn.com.ite.hnjtamis.exam.base.themebank.dao.ThemeBankDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.ThemeBank"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+			            <value>
+				            <![CDATA[
+				             from ThemeBank t 
+				             where (t.themeBankName like '%'||:nameTerm||'%' )
+				              and (t.isL = :validStr or :validStr is null)
+				              and (:op = 'query' or (:op = 'admin' and ((t.organId = :organIdTerm and t.bankPublic = '20') or t.bankPublic = '10')) 
+				              or (:op='dc' and t.organId = :organIdTerm and t.bankPublic = '20'))
+				              and (t.organId = :createOrganIdTerm or :createOrganIdTerm is null)
+				              and (t.bankType = :bankType or :bankType is null)
+				              order by t.themeBankCode,t.sortNum 
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="querySubHql">
+			            <value>
+				            <![CDATA[
+				             from ThemeBank t 
+				             where (t.themeBank = (select a.themeBank from ThemeBank a where a.themeBankId = :parentId)
+				                or (:parentId is null and t.themeBank is null)
+				                or (t.themeBank is null and (select a.themeBank from ThemeBank a where a.themeBankId = :parentId) is null))
+				             and (t.bankType = :bankType or :bankType is null)
+				            order by t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryPostsByBankId">
+			            <value>
+				            <![CDATA[
+				             from ThemeBankPost t where t.themeBank.themeBankId in (:themeBankId)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryProsByBankId">
+			            <value>
+				            <![CDATA[
+				             from ThemeBankProfession t where t.themeBank.themeBankId in (:themeBankId)
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="listInThemeBankCodeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ThemeBank a where a.themeBankCode = :themeBankCode and a.themeBankId <> :id
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="queryBankInThemeBankCodeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ThemeBank a where a.themeBankCode = :themeBankCode  
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryMaxCodeInThemeBankCodeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ThemeBank a where a.themeBankCode <> :themeBankCode  and a.themeBankCode like :themeBankCode || '%' order by a.themeBankCode desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryStandardTermsInBankIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from StandardTerms a where a.standardid in(select b.standardTerms.standardid from JobsStandardThemebank b where b.themeBankId =:id)
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		            <entry key="findDataSql">
+		            <value>
+		            <![CDATA[
+		            select distinct a.* from dictionary a,dictionary_type b 
+		            where a.dt_id=b.dt_id and b.dt_code=:typeCode 
+		            order by a.sort_no
+		            ]]></value>
+		            </entry>
+		      		<entry key="findThemeNumSql">
+		            <value>
+		            <![CDATA[
+				           select t.theme_bank_id themeBankId,count(*) themeNum from theme_in_bank t,theme v 
+				           where  v.theme_id = t.theme_id and t.theme_id is not null 
+				            and  v.is_Use = 5 and v.state = 15   group by t.theme_bank_id
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

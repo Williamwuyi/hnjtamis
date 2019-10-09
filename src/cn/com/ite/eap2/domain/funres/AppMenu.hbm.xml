@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.funres.AppMenu" table="APP_MENU">
+        <comment>系统菜单</comment>
+        <id name="menuId" type="java.lang.String">
+            <column name="MENU_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="appSystem" class="cn.com.ite.eap2.domain.funres.AppSystem" fetch="select">
+            <column name="APP_ID" length="64">
+                <comment>应用系统编号{'unique':[{name:'tagUnique',self:false}]}</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="moduleResource" class="cn.com.ite.eap2.domain.funres.ModuleResource" fetch="select">
+            <column name="RESOURCE_ID" length="64">
+                <comment>功能编号</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="appMenu" class="cn.com.ite.eap2.domain.funres.AppMenu" fetch="select">
+            <column name="PARENT_MENU_ID" length="64">
+                <comment>父菜单编号</comment>
+            </column>
+        </many-to-one>
+        <property name="menuName" type="java.lang.String">
+            <column name="MENU_NAME" length="64">
+                <comment>菜单名称</comment>
+            </column>
+        </property>
+        <property name="tabName" type="java.lang.String">
+            <column name="TAB_NAME" length="500">
+                <comment>页签标题{'unique':['tagUnique']}</comment>
+            </column>
+        </property>
+        <property name="target" type="integer">
+            <column name="TARGET" length="2">
+                <comment>打开方式</comment>
+            </column>
+        </property>
+        <property name="otherUrl" type="java.lang.String">
+            <column name="OTHER_URL" length="400">
+                <comment>外部地址</comment>
+            </column>
+        </property>
+        <property name="hidden" type="boolean">
+            <column name="HIDDEN">
+                <comment>是否隐藏</comment>
+            </column>
+        </property>
+        <property name="menuType" type="integer">
+            <column name="MENU_TYPE" length="2">
+                <comment>菜单类型</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" length="5">
+                <comment>序号</comment>
+            </column>
+        </property>
+        <property name="description" type="java.lang.String">
+            <column name="DESCRIPTION" length="500">
+                <comment>备注</comment>
+            </column>
+        </property>
+        <property name="expand" type="boolean">
+            <column name="IS_EXPAND" precision="2" scale="0">
+                <comment>是否展开</comment>
+            </column>
+        </property>
+        <property name="helpUrl" type="java.lang.String">
+            <column name="HELP_URL" length="250">
+                <comment>帮助地址</comment>
+            </column>
+        </property>
+        <property name="helpContent" type="java.lang.String">
+            <column name="HELP_CONTENT">
+                <comment>帮助内容</comment>
+            </column>
+        </property>
+        <property name="levelCode" type="java.lang.String">
+            <column name="LEVEL_CODE" length="64">
+                <comment>级别编码</comment>
+            </column>
+        </property>
+        <bag name="appMenus" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="PARENT_MENU_ID" length="64">
+                    <comment>父菜单编号</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.funres.AppMenu" />
+        </bag>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="LoginAction" class="cn.com.ite.eap2.module.power.login.LoginAction" scope="prototype" >
+		    <property name="service" ref="loginServer" />
+		</bean>
+		<bean id="loginServer" class="cn.com.ite.eap2.module.power.login.LoginServiceImpl" scope="prototype">
+		    <property name="dao" ref="loginDao" />
+		</bean>
+		<bean id="loginDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.power.SysUser"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="judgeLoginHql">
+		            <value>
+		            <![CDATA[
+		             select t from SysUser t where t.account = :account and (t.account = 'guest' or t.password = :password)
+		            ]]></value>
+		            </entry>
+		            <entry key="byProxyUserHql"><!--根据用户查询被代理用户 信息-->
+		            <value>
+		            <![CDATA[
+		             select t from SysUser t join t.proxyEmployee a,SysUser b 
+		             where a.employeeId = b.employee.employeeId and b.userId=:userId and t.proxyDate>sysdate
+		            ]]></value>
+		            </entry>
+		            <entry key="menuGroupHql"><!--查询菜单组（目录）-->
+		            <value>
+		            <![CDATA[
+		                select a.menuId as id,a.menuName as title,a.appMenu.menuId as parentId,'menugroup' as type,a.appSystem.appId as temp
+		                from AppMenu a where a.appSystem.appId=:appId or a.appSystem.appId='system' and a.menuType<>2 order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="menuHql"><!--获得主功能菜单-->
+		            <value>
+		            <![CDATA[
+		                select b from ModuleResource a right join a.appMenus b where (a is null or :userId='admin'
+		                  or exists (select x.userId from SysUser x join x.sysMangers y where 
+		                                   ((y.appId=a.appModule.appSystem.appId and a.appModule.appSystem.appId!='system') or 
+		                                   (a.popedomType=1 and a.appModule.appSystem.appId='system')) 
+		                                   and x.userId=:userId)
+		                  or exists (select x.userId from SysUser x join x.userRoles y join y.roleResources y where y.resourceId=a.resourceId and x.userId=:userId)
+		                  or exists (select x.quarterId from Quarter x join x.quarterRoles y join y.roleResources y where y.resourceId=a.resourceId and x.quarterId=:quarterId)
+		                ) and (a is null or a.resourceType = 1) and (b.appSystem.appId=:appId or b.appSystem.appId='system') and b.hidden=false order by b.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="proxyMenuHql"><!--代理模式下的主功能菜单-->
+		            <value>
+		            <![CDATA[
+		            select e
+		            from SysUser a join a.proxyResources b join b.appMenus e join a.proxyEmployee c,SysUser d
+		            where c.employeeId=d.employee.employeeId and d.userId = :userId 
+		             and (b.appModule.appSystem.appId=:appId or b.appModule.appSystem.appId='system')
+		             and e.hidden=false
+		            order by b.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="userAppHql"><!--用户系统，用于系统切换下拉-->
+		            <value>
+		            <![CDATA[
+		                select distinct a.appModule.appSystem from ModuleResource a where (:userId='admin'
+		                  or exists (select x.userId from SysUser x join x.sysMangers y where y.appId=a.appModule.appSystem.appId and x.userId=:userId)
+		                  or exists (select x.userId from SysUser x join x.userRoles y join y.roleResources y where y.resourceId=a.resourceId and x.userId=:userId)
+		                  or exists (select x.quarterId from Quarter x join x.quarterRoles y join y.roleResources y where y.resourceId=a.resourceId and x.quarterId=:quarterId)
+		                )
+		            ]]></value>
+		            </entry>
+		            <entry key="queryResourceHql"><!--用户的功能资源-->
+		            <value>
+		            <![CDATA[
+		            select a
+		            from ModuleResource a where (:userId='admin'
+		                  or exists (select x.userId from SysUser x join x.sysMangers y where 
+		                                       ((y.appId=a.appModule.appSystem.appId and a.appModule.appSystem.appId!='system')or 
+		                                        (a.popedomType=1 and a.appModule.appSystem.appId='system')) and x.userId=:userId)
+		                  or exists (select x.userId from SysUser x join x.userRoles y join y.roleResources y where y.resourceId=a.resourceId and x.userId=:userId)
+		                  or exists (select x.deptId from Dept x join x.deptRoles y join y.roleResources y where y.resourceId=a.resourceId and x.deptId=:deptId)
+		                  or exists (select x.quarterId from Quarter x join x.quarterRoles y join y.roleResources y where y.resourceId=a.resourceId and x.quarterId=:quarterId)
+		                )
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryProxyResourceHql"><!--代理模式下的用户功能资源编码-->
+		            <value>
+		            <![CDATA[
+		            select b
+		            from SysUser a join a.proxyResources b join a.proxyEmployee c,SysUser d 
+		            where c.employeeId=d.employee.employeeId and d.userId = :userId
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="deleteNoPopdemShuckMenu"><!--删除没有权限的快捷菜单-->
+		            <value>
+		            <![CDATA[
+		            delete MenuRecord m where m.userId=:userId and m.appMenu.menuId not in (:menus)
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

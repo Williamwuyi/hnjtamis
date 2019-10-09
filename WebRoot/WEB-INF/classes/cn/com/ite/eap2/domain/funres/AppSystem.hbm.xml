@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.funres.AppSystem" table="APP_SYSTEM">
+        <comment>应用系统{'unique':{'nameUnique':'系统名称重复！','codeUnique':'系统编码重复'},
+        'foreign':['cn.com.ite.eap2.domain.power.SysUser#app']}</comment>
+        <id name="appId" type="java.lang.String">
+            <column name="APP_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="appCode" type="java.lang.String">
+            <column name="APP_CODE" length="64">
+                <comment>应用系统编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="appName" type="java.lang.String">
+            <column name="APP_NAME" length="64">
+                <comment>应用系统名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="hasorgan" type="java.lang.String">
+            <column name="HASORGAN" length="4">
+                <comment>是否拥有独立机构</comment>
+            </column>
+        </property>
+        <property name="haspopedom" type="java.lang.String">
+            <column name="HASPOPEDOM" length="4">
+                <comment>是否拥有独立权限</comment>
+            </column>
+        </property>
+        <property name="hasswaraj" type="java.lang.String">
+            <column name="HASSWARAJ" length="4">
+                <comment>是否独立系统</comment>
+            </column>
+        </property>
+        <property name="appUrl" type="java.lang.String">
+            <column name="APP_URL" length="100">
+                <comment>系统地址</comment>
+            </column>
+        </property>
+        <property name="indexUrl" type="java.lang.String">
+            <column name="INDEX_URL" length="200">
+                <comment>首页地址</comment>
+            </column>
+        </property>
+        <property name="description" type="java.lang.String">
+            <column name="DESCRIPTION" length="500">
+                <comment>系统描述</comment>
+            </column>
+        </property>
+        <property name="userParaName" type="java.lang.String">
+            <column name="USER_PARA_NAME" length="64">
+                <comment>用户参数名</comment>
+            </column>
+        </property>
+        <property name="passParaName" type="java.lang.String">
+            <column name="PASS_PARA_NAME" length="64">
+                <comment>用户密码名</comment>
+            </column>
+        </property>
+        <property name="topLeftPic" type="java.lang.String">
+            <column name="TOP_LEFT_PIC" length="100">
+                <comment>顶部左边图片</comment>
+            </column>
+        </property>
+        <property name="topCenterPic" type="java.lang.String">
+            <column name="TOP_CENTER_PIC" length="100">
+                <comment>顶部中部扩展图片</comment>
+            </column>
+        </property>
+        <property name="topRightPic" type="java.lang.String">
+            <column name="TOP_RIGHT_PIC" length="100">
+                <comment>顶部右边图片</comment>
+            </column>
+        </property>
+        <property name="flashScreen" type="java.lang.Boolean">
+            <column name="FLASH_SCREEN" precision="1" scale="0">
+                <comment>主界面flash</comment>
+            </column>
+        </property>
+        <property name="smallPic" type="java.lang.String">
+            <column name="SMALL_PIC" length="100">
+                <comment>系统小图标</comment>
+            </column>
+        </property>
+        <property name="stat" type="integer">
+            <column name="STAT" length="2">
+                <comment>1运行2调试</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>排序号</comment>
+            </column>
+        </property>
+        <property name="theme" type="java.lang.String">
+            <column name="THEME" length="64">
+                <comment>主题标识</comment>
+            </column>
+        </property>
+        <set name="homePanels" inverse="true" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>首页面板</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.funres.HomePanel" />
+        </set>
+        <set name="appModules" inverse="true" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>模块目录</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.funres.AppModule" />
+        </set>
+        <bag name="systemOrgans" table="SYSTEM_ORGAN" inverse="true" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>系统机构</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.organization.Organ" column="ORGAN_ID"/>
+        </bag>
+        <list name="systemMangers" table="SYS_MANGER" inverse="false" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>系统管理员</comment>
+                </column>
+            </key>
+            <index column="ORDER_NO"/>
+            <many-to-many class="cn.com.ite.eap2.domain.power.SysUser" column="USER_ID"/>
+        </list>
+        <bag name="dictionaryTypes" table="SYS_DIC" inverse="true" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>系统相关数据字典类型</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.baseinfo.DictionaryType" column="DT_ID"/>
+        </bag>
+        <set name="appMenus" inverse="true" lazy="true">
+            <key>
+                <column name="APP_ID" length="64">
+                    <comment>系统菜单</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.funres.AppMenu" />
+        </set>
+    </class>
+</hibernate-mapping>

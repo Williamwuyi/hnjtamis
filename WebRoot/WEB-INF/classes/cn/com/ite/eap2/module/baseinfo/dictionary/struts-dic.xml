@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="dictionary" extends="eap-default" namespace="/baseinfo/dic">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">dictionaryTypes.*</param>
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 
+                <param name="excludeProperties">dictionaries.*,dictionaryType\.[A-Za-z0-9_]+,handler</param>--> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="query">
+                <param name="includeProperties">dictionaryTypes\[\d+\]\.[A-Za-z0-9_]+,dictionaryTypes\[\d+\]\.dictionaries\[\d+\]\.[A-Za-z0-9_]+,dictionaryTypes\[\d+\]\.dictionaryTypes\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findData">
+                <param name="includeProperties">datas\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param>
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                form.dictionaryType.dtId,form.dictionaryType.dtName,
+                form.dictionaries\[\d+\]\.[A-Za-z0-9_]+,
+                form.sysDics\[\d+\]\.appId,form.sysDics\[\d+\]\.appName</param>
+                <param name="excludeProperties">form.dictionaryTypes</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="subList">
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">dictionaryTypes\[\d+\]\.[A-Za-z0-9_]+</param> 
+                <!-- 这个属性表示不要包含进JSON数据中的数据。-->
+                <param name="excludeProperties">dictionaryTypes\[\d+\]\.dictionaries.*,
+                dictionaryTypes\[\d+\]\.dictionaryTypes.*,
+                dictionaryTypes\[\d+\]\.dictionaryType.*,
+                dictionaryTypes\[\d+\]\.sysDics.*</param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

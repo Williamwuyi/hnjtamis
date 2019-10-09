@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.power.SysUser" table="SYS_USER">
+        <comment>用户{'unique':{'accountUnique':'账号重复！'}}</comment>
+        <id name="userId" type="java.lang.String">
+            <column name="USER_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="employee" class="cn.com.ite.eap2.domain.organization.Employee" fetch="select">
+            <column name="EMPLOYEE_ID" length="64">
+                <comment>员工</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="app" class="cn.com.ite.eap2.domain.funres.AppSystem" fetch="select">
+            <column name="APP_ID" length="64">
+                <comment>缺省应用系统</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="proxyEmployee" class="cn.com.ite.eap2.domain.organization.Employee" fetch="select">
+            <column name="PE_ID" length="64">
+                <comment>代理员工</comment>
+            </column>
+        </many-to-one>
+        <property name="proxyDate" type="java.util.Date">
+            <column name="PE_DATE">
+                <comment>代理结止日期</comment>
+            </column>
+        </property>
+        <property name="account" type="java.lang.String">
+            <column name="ACCOUNT" length="64">
+                <comment>用户帐号{'unique':['accountUnique']}</comment>
+            </column>
+        </property>
+        <property name="password" type="java.lang.String">
+            <column name="PASSWORD" length="64">
+                <comment>用户密码</comment>
+            </column>
+        </property>
+        <property name="theme" type="java.lang.String">
+            <column name="THEME" length="64">
+                <comment>主题</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>序号</comment>
+            </column>
+        </property>
+        <property name="allowRepeatLogin" type="boolean">
+            <column name="ALLOW_REPEAT_LOGIN">
+                <comment>一个账号是否可重复登录</comment>
+            </column>
+        </property>
+        <property name="validation" type="boolean">
+            <column name="ISVALIDATION">
+                <comment>是否有效</comment>
+            </column>
+        </property>
+        <property name="tig" type="boolean">
+            <column name="IS_TIG">
+                <comment>登录缺省密码提示修改</comment>
+            </column>
+        </property>
+        <many-to-one name="organ" class="cn.com.ite.eap2.domain.organization.Organ" fetch="select">
+            <column name="ORGAN_ID" length="64">
+                <comment>所在机构</comment>
+            </column>
+        </many-to-one>
+        <set name="userRoles" table="USER_ROLE" lazy="true">
+            <key>
+                <column name="USER_ID" length="64">
+                    <comment>用户角色</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.power.SysRole" column="ROLE_ID"/>
+        </set>
+        <set name="proxyResources" table="PROXY_RESOURCE" lazy="true">
+            <key>
+                <column name="USER_ID" length="64">
+                    <comment>代理资源</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.funres.ModuleResource" column="RESOURCE_ID"/>
+        </set>
+        <set name="userMapps" inverse="false" lazy="true">
+            <key>
+                <column name="USER_ID" length="64">
+                    <comment>用户系统映射</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.power.UserMapp" />
+        </set>
+        <set name="sysMangers" table="SYS_MANGER" inverse="true" lazy="true">
+            <key>
+                <column name="USER_ID" length="64">
+                    <comment>管理的系统</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.funres.AppSystem" column="APP_ID"/>
+        </set>
+    </class>
+</hibernate-mapping>

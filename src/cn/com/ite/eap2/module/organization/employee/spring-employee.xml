@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="EmployeeListAction" class="cn.com.ite.eap2.module.organization.employee.EmployeeListAction" scope="prototype" >
+		    <property name="service" ref="employeeServer" />
+		</bean>
+		<bean id="EmployeeFormAction" class="cn.com.ite.eap2.module.organization.employee.EmployeeFormAction" scope="prototype" >
+		    <property name="service" ref="employeeServer" />
+		</bean>
+		<bean id="employeeServer" class="cn.com.ite.eap2.module.organization.employee.EmployeeServiceImpl" scope="prototype">
+		    <property name="dao" ref="employeeDao" />
+		    <property name="deptService" ref="deptServer" />
+		    <property name="organService" ref="organServer" />
+		</bean>
+		<bean id="employeeDao" class="cn.com.ite.eap2.module.organization.employee.EmployeeDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.organization.Employee"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from Employee t 
+		            where (t.employeeName like '%'||:nameTerm||'%' or t.alias like '%'||:nameTerm||'%' or :nameTerm is null)
+		              and (employeeCode = :codeTerm or :codeTerm is null)
+		              and (t.dept.deptId in(select dd.deptId from Dept dd where dd.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.dept.deptId = :deptTerm)
+		              or t.dept.organ.organId = :deptTerm 
+		              or :deptTerm is null)
+		              and (t.quarter.quarterId = :quarterTerm or :quarterTerm is null)
+		              and (t.quarterTrainId = :quarterTrainTerm or :quarterTrainTerm is null)
+		              and t.dept.organ.levelCode like (select x.levelCode from Organ x where x.organId=:organTerm)||'%'
+		              and (t.validation = :valid or :valid is null)
+		              and (instr(','|| :deptIds ||',' , ',' || t.dept.deptId || ',') > 0  or :deptIds is null)
+		              order by t.dept.orderNo,t.dept.deptCode,t.dept.deptName,t.quarterTrainCode,t.employeeCode,t.orderNo 
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="queryHql1">
+		            <value>
+		            <![CDATA[
+		             from Employee t 
+		            where (t.employeeName like '%'||:nameTerm||'%' or t.alias like '%'||:nameTerm||'%' or :nameTerm is null)
+		              and (employeeCode = :codeTerm or :codeTerm is null)
+		              and (t.dept.deptId in(select dd.deptId from Dept dd where dd.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.dept.deptId = :deptTerm)
+		              or t.dept.organ.organId = :deptTerm 
+		              or :deptTerm is null)
+		              and (t.quarter.quarterId = :quarterTerm or :quarterTerm is null)
+		              and (t.quarterTrainId = :quarterTrainTerm or :quarterTrainTerm is null)
+		              and t.dept.organ.levelCode like (select x.levelCode from Organ x where x.organId=:organTerm)||'%'
+		              and (t.validation = :valid or :valid is null)
+		              and (instr(','|| :deptIds ||',' , ',' || t.dept.deptId || ',') > 0  or :deptIds is null)
+		              and t.quarterTrainId is not null
+		              order by t.dept.orderNo,t.dept.deptCode,t.dept.deptName,t.quarterTrainCode,t.employeeCode,t.orderNo 
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="queryHql2">
+		            <value>
+		            <![CDATA[
+		             from Employee t 
+		            where (t.employeeName like '%'||:nameTerm||'%' or t.alias like '%'||:nameTerm||'%' or :nameTerm is null)
+		              and (employeeCode = :codeTerm or :codeTerm is null)
+		              and (t.dept.deptId in(select dd.deptId from Dept dd where dd.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.deptId = :deptTerm)
+		              	or t.dept.deptId in(select dd.deptId from Dept dd where dd.dept.dept.deptId = :deptTerm)
+		              or t.dept.organ.organId = :deptTerm 
+		              or :deptTerm is null)
+		              and (t.quarter.quarterId = :quarterTerm or :quarterTerm is null)
+		              and (t.quarterTrainId = :quarterTrainTerm or :quarterTrainTerm is null)
+		              and t.dept.organ.levelCode like (select x.levelCode from Organ x where x.organId=:organTerm)||'%'
+		              and (t.validation = :valid or :valid is null)
+		              and (instr(','|| :deptIds ||',' , ',' || t.dept.deptId || ',') > 0  or :deptIds is null)
+		              and t.quarterTrainId is null
+		              order by t.dept.orderNo,t.dept.deptCode,t.dept.deptName,t.quarterTrainCode,t.employeeCode,t.orderNo 
+		            ]]></value>
+		            </entry>
+		            <entry key="queryQuarterInTrainCode">
+		            <value>
+		            <![CDATA[
+		             from Quarter q where q.dept.deptId = :deptId and q.quarterTrainCode = :quarterTrainCode
+		            ]]></value>
+		            </entry>
+		             <entry key="queryTalentByEmployee">
+		            <value>
+		            <![CDATA[
+		             from TalentRegistration q where q.employee.employeeId = :employeeId
+		            ]]></value>
+		            </entry>
+		             <entry key="queryUserByEmployee">
+		            <value>
+		            <![CDATA[
+		             from SysUser q where q.employee.employeeId = :employeeId
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

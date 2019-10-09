@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.workflow.domain.WorkFlowExcute" table="WORK_FLOW_EXCUTE">
+        <comment>流程执行</comment>
+        <id name="excuteId" type="java.lang.String">
+            <column name="EXCUTE_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="workFlowTo" class="cn.com.ite.workflow.domain.WorkFlowTo" fetch="select">
+            <column name="TO_ID" length="64">
+                <comment>导向ID</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="workFlowNode" class="cn.com.ite.workflow.domain.WorkFlowNode" fetch="select">
+            <column name="NODE_ID" length="64">
+                <comment>结点ID</comment>
+            </column>
+        </many-to-one>
+        <property name="busId" type="java.lang.String">
+            <column name="BUS_ID" length="64">
+                <comment>流程标识</comment>
+            </column>
+        </property>
+        <property name="parentBusId" type="java.lang.String">
+            <column name="PARENT_BUS_ID" length="64">
+                <comment>父流程标识</comment>
+            </column>
+        </property>
+        <property name="taskName" type="java.lang.String">
+            <column name="TASK_NAME" length="64">
+                <comment>任务名称</comment>
+            </column>
+        </property>
+        <property name="quarterId" type="java.lang.String">
+            <column name="QUARTER_ID" length="64">
+                <comment>执行岗位ID</comment>
+            </column>
+        </property>
+        <property name="quarterName" type="java.lang.String">
+            <column name="QUARTER_NAME" length="64">
+                <comment>执行岗位名</comment>
+            </column>
+        </property>
+        <property name="employeeId" type="java.lang.String">
+            <column name="EMPLOYEE_ID" length="64">
+                <comment>执行人ID</comment>
+            </column>
+        </property>
+        <property name="employeeName" type="java.lang.String">
+            <column name="EMPLOYEE_NAME" length="64">
+                <comment>执行人名称</comment>
+            </column>
+        </property>
+        <property name="agent" type="java.lang.String">
+            <column name="AGENT" length="64">
+                <comment>代理人</comment>
+            </column>
+        </property>
+        <property name="createTime" type="java.util.Date">
+            <column name="CREATE_TIME" length="7">
+                <comment>创建时间</comment>
+            </column>
+        </property>
+        <property name="excuteTiime" type="java.util.Date">
+            <column name="EXCUTE_TIIME" length="7">
+                <comment>执行时间</comment>
+            </column>
+        </property>
+        <property name="planTime" type="java.util.Date">
+            <column name="PLAN_TIME" length="7">
+                <comment>计划时间</comment>
+            </column>
+        </property>
+        <property name="ip" type="java.lang.String">
+            <column name="IP" length="64">
+                <comment>操作电脑IP</comment>
+            </column>
+        </property>
+        <property name="advice" type="java.lang.String">
+            <column name="ADVICE" length="600">
+                <comment>操作描述</comment>
+            </column>
+        </property>
+        <property name="ifUndo" type="java.lang.Boolean">
+            <column name="IF_UNDO" precision="2" scale="0">
+                <comment>是否撤消</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>顺序码</comment>
+            </column>
+        </property>
+        <map name="param" table="WORK_FLOW_EXCUTE_PARAM" cascade="all,delete-orphan">  
+            <key column="EXCUTE_ID"/>
+            <map-key column="PARAM_KEY" type="string"/>   
+            <element column="PARAM_VALUE" type="string"></element>  
+        </map>  
+    </class>
+</hibernate-mapping>

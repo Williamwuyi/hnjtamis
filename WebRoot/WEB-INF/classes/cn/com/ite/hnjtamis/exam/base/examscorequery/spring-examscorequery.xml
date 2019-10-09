@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ExamScoreQueryListAction" class="cn.com.ite.hnjtamis.exam.base.examscorequery.ExamScoreQueryListAction" scope="prototype" >
+		    <property name="service" ref="examScoreQueryServer" />
+		</bean>
+		<bean id="ExamScoreQueryExcelAction" class="cn.com.ite.hnjtamis.exam.base.examscorequery.ExamScoreQueryExcelAction" scope="prototype" >
+		    <property name="service" ref="examScoreQueryServer" />
+		</bean>
+		<bean id="examScoreQueryServer" class="cn.com.ite.hnjtamis.exam.base.examscorequery.service.ExamScoreQueryServiceImpl" scope="prototype">
+		    <property name="dao" ref="examScoreQueryDao" />
+		</bean>
+		<bean id="examScoreQueryDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.ExamUserTestpaper"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryTimuByExamPaperId">
+			            <value>
+				            <![CDATA[
+				              from ExamTestpaperTheme t where t.examTestpaper.examTestpaperId=:testPaperId order by t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		             <entry key="queryTimuByExamPaperIdInExam">
+			            <value>
+				            <![CDATA[
+				              from ExamTestpaperTheme t where t.examTestpaper.examTestpaperId=:testPaperId order by t.randomSortnum
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryTimuAnsByExamPaperIdInExam">
+			            <value>
+				            <![CDATA[
+				              from ExamTestpaperAnswerkey t where 
+				              t.examTestpaperTheme.examTestpaper.examTestpaperId=:testPaperId
+				               order by t.examTestpaperTheme.randomSortnum,t.randomSortnum
+				            ]]>
+			            </value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		        	<entry key="queryExamThemeTypeByExamIdSql">
+			            <value>
+				            <![CDATA[
+				               select distinct(t.theme_type_name) from exam_testpaper_theme t where 
+				               	t.exam_id=:examId
+								union all
+								select distinct(decode(tt.score_type,'0','客观题','1','主观题',2,'系统外',null)) 
+								from exam_testpaper_theme tt where tt.exam_id=:examId
+				            ]]>
+			            </value>
+		            </entry>
+
+		            <entry key="queryScoreByExamIdSql">
+			            <value>
+				            <![CDATA[
+				             select a.testpaper_id,a.exam_name,a.user_name,a.frist_scote, 
+								b.danxuan,b.duoxuan,b.tiankong,b.panduan,b.wenda,b.shiting,b.qita,b.keguan,b.zhuguan,b.xtw,
+								b.lst,b.jst,b.htt  from 
+								(select e.exam_name,eutp.testpaper_id,eutp.user_name, eutp.frist_scote 
+								from exam_user_testpaper eutp,exam e where 
+								e.exam_id = eutp.exam_id and 
+								eutp.user_organ_id in(
+									SELECT o.organ_id
+									FROM organ o
+									START WITH o.organ_id = :organId
+									 CONNECT BY PRIOR o.organ_id=o.parent_organ_id 
+								) and
+								eutp.state='30' and
+								eutp.exam_id=:examId) a,
+								
+								(select tt.exam_testpaper_id testpaperid,
+								       sum(decode(tt.theme_type_name,'单选题',tt.score,null)) as danxuan,
+								       sum(decode(tt.theme_type_name,'多选题',tt.score,null)) as duoxuan,
+								       sum(decode(tt.theme_type_name,'填空题',tt.score,null)) as tiankong,   
+								       sum(decode(tt.theme_type_name,'判断题',tt.score,null)) as panduan,
+								       sum(decode(tt.theme_type_name,'问答题',tt.score,null)) as wenda,
+								       sum(decode(tt.theme_type_name,'视听题',tt.score,null)) as shiting,
+								       sum(decode(tt.theme_type_name,'论述题',tt.score,null)) as lst,
+                       				   sum(decode(tt.theme_type_name,'计算题',tt.score,null)) as jst,
+                       				   sum(decode(tt.theme_type_name,'画图题',tt.score,null)) as htt,
+								       sum(decode(tt.theme_type_name,'其它',tt.score,null)) as qita,
+								       sum(decode(tt.score_type,'0',tt.score,null)) as keguan,
+                       				   sum(decode(tt.score_type,'1',tt.score,null)) as zhuguan,
+                       				   sum(decode(tt.score_type,'2',tt.score,null)) as xtw          
+								from exam_testpaper_theme tt 
+								where tt.exam_id=:examId
+								group by tt.exam_testpaper_id order by tt.exam_testpaper_id) b
+								where a.testpaper_id = b.testpaperid
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryAllScoreByExamIdSql">
+			            <value>
+				            <![CDATA[
+				             select a.testpaper_id,a.exam_name,a.user_name,a.frist_scote, 
+								b.danxuan,b.duoxuan,b.tiankong,b.panduan,b.wenda,b.shiting,b.qita,b.keguan,b.zhuguan,b.xtw,
+								b.lst,b.jst,b.htt  from 
+								(select e.exam_name,eutp.testpaper_id,eutp.user_name, eutp.frist_scote 
+								from exam_user_testpaper eutp,exam e where 
+								e.exam_id = eutp.exam_id  and eutp.exam_id=:examId) a,
+								(select tt.exam_testpaper_id testpaperid,
+								       sum(decode(tt.theme_type_name,'单选题',tt.score,null)) as danxuan,
+								       sum(decode(tt.theme_type_name,'多选题',tt.score,null)) as duoxuan,
+								       sum(decode(tt.theme_type_name,'填空题',tt.score,null)) as tiankong,   
+								       sum(decode(tt.theme_type_name,'判断题',tt.score,null)) as panduan,
+								       sum(decode(tt.theme_type_name,'问答题',tt.score,null)) as wenda,
+								       sum(decode(tt.theme_type_name,'视听题',tt.score,null)) as shiting,
+								       sum(decode(tt.theme_type_name,'论述题',tt.score,null)) as lst,
+                       				   sum(decode(tt.theme_type_name,'计算题',tt.score,null)) as jst,
+                       				   sum(decode(tt.theme_type_name,'画图题',tt.score,null)) as htt,
+								       sum(decode(tt.theme_type_name,'其它',tt.score,null)) as qita,
+								       sum(decode(tt.score_type,'0',tt.score,null)) as keguan,
+                       				   sum(decode(tt.score_type,'1',tt.score,null)) as zhuguan,
+                       				   sum(decode(tt.score_type,'2',tt.score,null)) as xtw          
+								from exam_testpaper_theme tt 
+								where tt.exam_id=:examId
+								group by tt.exam_testpaper_id order by tt.exam_testpaper_id) b
+								where a.testpaper_id = b.testpaperid
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryScoreByEmpIdSql">
+			            <value>
+				            <![CDATA[
+				             select a.testpaper_id,a.exam_name,a.user_name,a.frist_scote, 
+								b.danxuan,b.duoxuan,b.tiankong,b.panduan,b.wenda,b.shiting,b.qita,b.keguan,b.zhuguan,b.xtw,
+								b.lst,b.jst,b.htt from 
+								(select e.exam_name,eutp.testpaper_id,eutp.user_name, eutp.frist_scote from (
+				                select * from exam_user_testpaper et where  (et.relation_type not like 'mo%' or et.relation_type is null)
+				                and et.employee_id=:empid and et.state='30') eutp,
+				                (select * from exam ea where (ea.relation_type not like 'mo%' or ea.relation_type is null)
+				                 and (ea.exam_id=:examId or :examId is null)) e
+								where e.exam_id = eutp.exam_id  ) a,
+								(select tt.exam_testpaper_id testpaperid,
+								       sum(decode(ts.theme_type,'5',tt.score,null)) as danxuan,
+								       sum(decode(ts.theme_type,'10',tt.score,null)) as duoxuan,
+								       sum(decode(ts.theme_type,'15',tt.score,null)) as tiankong,   
+								       sum(decode(ts.theme_type,'25',tt.score,null)) as panduan,
+								       sum(decode(ts.theme_type,'20',tt.score,null)) as wenda,
+                       				   sum(decode(ts.theme_type,'30',tt.score,null)) as shiting,
+                       				   sum(decode(ts.theme_type,'35',tt.score,null)) as qita,
+                       				   sum(decode(ts.theme_type,'40',tt.score,null)) as lst,
+                       				   sum(decode(ts.theme_type,'45',tt.score,null)) as jst,
+                       				   sum(decode(ts.theme_type,'50',tt.score,null)) as htt,
+								       sum(decode(tt.score_type,'0',tt.score,null)) as keguan,
+                       				   sum(decode(tt.score_type,'1',tt.score,null)) as zhuguan,
+                       				   sum(decode(tt.score_type,'2',tt.score,null)) as xtw          
+								from exam_testpaper_theme tt ,theme_type ts,
+								(  select * from exam_user_testpaper et where et.employee_id=:empid
+               						 and et.state='30' and (et.relation_type not like 'mo%' or et.relation_type is null))  ett 
+                				where tt.theme_type_id = ts.theme_type_id and tt.exam_testpaper_id = ett.testpaper_id
+								group by tt.exam_testpaper_id order by tt.exam_testpaper_id) b
+								where a.testpaper_id = b.testpaperid
+				            ]]>
+			            </value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

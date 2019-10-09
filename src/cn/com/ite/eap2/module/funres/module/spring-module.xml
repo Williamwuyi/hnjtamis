@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ModuleListAction" class="cn.com.ite.eap2.module.funres.module.ModuleListAction" scope="prototype" >
+		    <property name="service" ref="moduleServer" />
+		</bean>
+		<bean id="ModuleFormAction" class="cn.com.ite.eap2.module.funres.module.ModuleFormAction" scope="prototype" >
+		    <property name="service" ref="moduleServer" />
+		</bean>
+		<bean id="moduleServer" class="cn.com.ite.eap2.module.funres.module.ModuleServiceImpl" scope="prototype">
+		    <property name="dao" ref="moduleDao" />
+		</bean>
+		<bean id="moduleDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.funres.AppModule"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		            select a from AppModule a left join a.moduleResources b where a.appSystem.appId = :appTerm 
+		            and a.moduleName like '%'||:nameTerm||'%' and a.moduleCode like '%'||:codeTerm||'%'
+		            and size(a.appModules)=0 and (b.resourceCode like '%'||:resourceCodeTerm||'%' or :resourceCodeTerm is null)
+		            and (b.resourceName like '%'||:resourceNameTerm||'%' or :resourceNameTerm is null)
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryResourceHql">
+		            <value>
+		            <![CDATA[
+		            select a.resourceId as id,a.resourceName as title,b.moduleId as parentId 
+		            from ModuleResource a inner join a.appModule b inner join b.appSystem c where c.appId = :appTerm 
+		            and (a.resourceName like '%'||:nameTerm||'%' or :nameTerm is null)
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from AppModule t 
+		             where (t.appModule = (select a.appModule from AppModule a where a.moduleId=:parentId) 
+		                or (:parentId is null and t.appModule is null)
+		                or (t.appModule is null and (select a.appModule from AppModule a where a.moduleId=:parentId) is null)) 
+		               and t.appSystem.appId = :appTerm
+		             order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryAppHql">
+		            <value>
+		            <![CDATA[
+		            select a.appId as id,a.appName as title,'app' as type
+		            from AppSystem a order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryModuleHql">
+		            <value>
+		            <![CDATA[
+		            select a.moduleId as id,a.moduleName as title,a.appModule.moduleId as parentId,
+		            'module' as type,a.appSystem.appId as temp from AppModule a order by orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryPepdomResourceHql">
+		            <value>
+		            <![CDATA[
+		            select a.resourceId as id,a.resourceName as title,a.appModule.moduleId as parentId,'resource' as type
+		            from ModuleResource a where (:userId='admin'
+		                  or exists (select x.userId from SysUser x join x.sysMangers y where y.appId=a.appModule.appSystem.appId and x.userId=:userId)
+		                  or exists (select x.userId from SysUser x join x.userRoles y join y.roleResources y where y.resourceId=a.resourceId and x.userId=:userId)
+		                  or exists (select x.quarterId from Quarter x join x.quarterRoles y join y.roleResources y where y.resourceId=a.resourceId and x.quarterId=:quarterId)
+		                ) and a.popedomType=2
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryProxyResourceHql">
+		            <value>
+		            <![CDATA[
+		            select b.resourceId as id,b.resourceName as title,b.appModule.moduleId as parentId 
+		            from SysUser a join a.proxyResources b join a.proxyEmployee c,SysUser d 
+		            where c.employeeId=d.employee.employeeId and d.userId = :proxyUserId and a.userId = :userId
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryMenuForModule">
+		            <value>
+		            <![CDATA[
+		            select m from AppMenu m where m.menuName=:name and m.appSystem.appId=:appId and m.menuType=1
+		            ]]></value>
+		            </entry>
+		            <entry key="urlUnique">
+		            <value>
+		            <![CDATA[
+		            from ModuleResource m where m.appModule.appSystem.appId=:appId 
+		            and (m.resourceUrl like :url||'%' or :url like m.resourceUrl||'%')
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="DeptListAction" class="cn.com.ite.eap2.module.organization.dept.DeptListAction" scope="prototype" >
+		    <property name="service" ref="deptServer" />
+		</bean>
+		<bean id="DeptFormAction" class="cn.com.ite.eap2.module.organization.dept.DeptFormAction" scope="prototype" >
+		    <property name="service" ref="deptServer" />
+		</bean>
+		<bean id="deptServer" class="cn.com.ite.eap2.module.organization.dept.DeptServiceImpl" scope="prototype">
+		    <property name="dao" ref="deptDao" />
+		</bean>
+		<bean id="deptDao" class="cn.com.ite.eap2.module.organization.dept.DeptDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.organization.Dept"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from Dept t 
+		            where (t.deptName like '%'||:nameTerm||'%' or t.deptAlias like '%'||:nameTerm||'%')
+		              and (t.deptType = :typeTerm or :typeTerm is null) 
+		              and (t.deptCode = :codeTerm or :codeTerm is null)
+		              and (t.validation = :valid or :valid is null)
+		              and (t.organ.organId = :organTerm or :organTerm is null)
+		              order by t.orderNo 
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from Dept t 
+		             where (t.dept = (select a.dept from Dept a where a.deptId=:parentId) 
+		                or (:parentId is null and t.dept is null and t.organ.organId=:organTerm)
+		                or (t.dept is null and (select a.dept from Dept a where a.deptId=:parentId) is null and t.organ.organId=:organTerm))
+		             order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTreeHql">
+		            <value>
+		            <![CDATA[
+		            select a.deptId as id,a.deptName as title,a.dept.deptId as parentId,'dept' as type,a.organ.organId as tagName,a.orderNo as orderNo 
+		            from Dept a where (a.deptName like '%'||:nameTerm||'%' or :nameTerm is null)
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryOrganTreeHql">
+		            <value>
+		            <![CDATA[
+		            select a.organId as id,a.organName as title,a.organ.organId as parentId,'organ' as type 
+		            from Organ a order by a.orderNo
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

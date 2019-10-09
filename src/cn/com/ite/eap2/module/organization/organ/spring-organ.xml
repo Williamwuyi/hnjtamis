@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="OrganListAction" class="cn.com.ite.eap2.module.organization.organ.OrganListAction" scope="prototype" >
+		    <property name="service" ref="organServer" />
+		</bean>
+		<bean id="OrganFormAction" class="cn.com.ite.eap2.module.organization.organ.OrganFormAction" scope="prototype" >
+		    <property name="service" ref="organServer" />
+		</bean>
+		<bean id="organServer" class="cn.com.ite.eap2.module.organization.organ.OrganServiceImpl" scope="prototype">
+		    <property name="dao" ref="organDao" />
+		</bean>
+		<bean id="organDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.organization.Organ"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from Organ t 
+		            where (t.organName like '%'||:nameTerm||'%' or t.organAlias like '%'||:nameTerm||'%')
+		              and (t.organType = :typeTerm or :typeTerm is null) and size(t.organs)=0 
+		              and (t.organCode = :codeTerm or :codeTerm is null)
+		              and (t.area like '%'||:areaTerm||'%' or :areaTerm is null)
+		              and (t.validation = :valid or :valid is null)
+		              order by t.orderNo 
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from Organ t 
+		             where (t.organ = (select a.organ from Organ a where a.organId = :parentId)
+		                or (:parentId is null and t.organ is null)
+		                or (t.organ is null and (select a.organ from Organ a where a.organId = :parentId) is null))
+		            order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryDeptHql">
+		            <value>
+		            <![CDATA[
+		             from Dept t 
+		            where (t.deptName like '%'||:nameTerm||'%' or t.deptAlias like '%'||:nameTerm||'%')
+		              and (t.deptType = :typeTerm or :typeTerm is null) 
+		              and size(t.depts)=0 and (t.deptCode = :codeTerm or :codeTerm is null)
+		              and (t.validation = :valid or :valid is null)
+		              order by t.orderNo 
+		            ]]></value>
+		            </entry>
+		            <entry key="queryDeptTreeHql">
+		            <value>
+		            <![CDATA[
+		            select a.deptId||'||'||a.organ.organId as id,a.deptName as title,b.dept.deptId as parentId 
+		            from Dept a where (t.deptName like '%'||:nameTerm||'%' or t.deptAlias like '%'||:nameTerm||'%' or :nameTerm is null)
+		            order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryEmployeeHql">
+		            <value>
+		            <![CDATA[
+		            from Employee e where e.dept.organ.levelCode like :level||'%'
+		            ]]></value>
+		            </entry>
+		            <entry key="queryUserHql">
+		            <value>
+		            <![CDATA[
+		            from SysUser e where e.organ.levelCode like :level||'%'
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		            <entry key="findDataSql">
+		            <value>
+		            <![CDATA[
+		            select distinct a.* from dictionary a,dictionary_type b 
+		            where a.dt_id=b.dt_id and b.dt_code=:typeCode 
+		            order by a.sort_no
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

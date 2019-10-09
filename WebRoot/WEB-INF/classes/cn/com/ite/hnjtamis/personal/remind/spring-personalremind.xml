@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="PersonalRemindListAction" class="cn.com.ite.hnjtamis.personal.remind.PersonalRemindListAction" scope="prototype" >
+		    <property name="service" ref="personalremindServer" />
+		</bean>
+		<bean id="PersonalRemindFormAction" class="cn.com.ite.hnjtamis.personal.remind.PersonalRemindFormAction" scope="prototype" >
+		    <property name="service" ref="personalremindServer" />
+		</bean>
+		
+		<bean id="personalremindServer" class="cn.com.ite.hnjtamis.personal.remind.PersonalRemindServiceImpl" scope="prototype">
+		    <property name="dao" ref="personalremindDao" />
+		</bean>
+		<bean id="personalremindDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.personal.domain.PersonalRemind"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from PersonalRemind t where (t.creationDate >= :startTimeTerm or :startTimeTerm is null) 
+		            	and (t.creationDate <= :endTimeTerm or :endTimeTerm is null)
+		            	and (t.personcode=:personcodeTerm or :personcodeTerm is null)
+		            	and (t.contents like '%'||:contentsTerm||'%' or :contentsTerm is null)
+		            	and t.status<>3 
+		             order by creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		       </map>
+		   </property>
+		</bean>
+</beans>

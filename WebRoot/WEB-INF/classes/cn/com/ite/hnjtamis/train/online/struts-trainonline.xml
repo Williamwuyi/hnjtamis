@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="trainonline" extends="eap-default" namespace="/train/online">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">               
+                <param name="includeProperties">
+                total,list\[\d+\]\.[A-Za-z0-9_]+,
+                list\[\d+\]\.trainImplement\.[A-Za-z0-9_]+
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+            	<!-- <param name="root">form</param>-->
+                <param name="includeProperties">
+                form\.[A-Za-z0-9_]+,
+                form\.trainImplement\.[A-Za-z0-9_]+
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="redirectAction" name="study">
+                <param name="actionName">train/impl/listForTrainImplementListAction!list.action</param>
+                <param name="id">${id}</param>
+            </result>
+             <result name="test" type="redirect">
+       	   	  <param name="location">/onlineExam/examMoniForOnlineListAction!examMoni.action</param>
+       	   	  <param name="id">${userTestPaperId}</param> 
+       	   	  <param name="isHidden">${isHidden}</param> 
+       	   	  <param name="addExam">${addExam}</param> 
+       	   	  <param name="addExamType">${addExamType}</param> 
+       	   	  <param name="clean">${clean}</param>
+       	   </result>
+            <result name="showCourseInfo">
+                /modules/hnjtamis/train/CourseInfo.jsp
+            </result>
+            <result name="showStudy">
+                /modules/hnjtamis/train/study.jsp
+            </result>
+            <result name="findStudyRecord">
+                /modules/hnjtamis/train/studyRecord.jsp
+            </result>
+            <result type="json" name="findEmployeeCourseTree">
+                <param name="root">courseAcces</param>
+                <param name="excludeNullProperties">false</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findPreCourse">
+                <param name="root">preCourse</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findAccessory">
+                <param name="includeProperties">
+                	accessory\.[A-Za-z0-9_]+
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

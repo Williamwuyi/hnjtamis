@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="RoleListAction" class="cn.com.ite.eap2.module.power.role.RoleListAction" scope="prototype" >
+		    <property name="service" ref="roleServer" />
+		</bean>
+		<bean id="RoleFormAction" class="cn.com.ite.eap2.module.power.role.RoleFormAction" scope="prototype" >
+		    <property name="service" ref="roleServer" />
+		</bean>
+		<bean id="roleServer" class="cn.com.ite.eap2.module.power.role.RoleServiceImpl" scope="prototype">
+		    <property name="dao" ref="roleDao" />
+		</bean>
+		<bean id="roleDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.power.RoleType"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from RoleType t 
+		            where t.roleTypename like '%'||:nameTerm||'%' 
+		              and t.roleTypeCode like '%'||:codeTerm||'%' 
+					  order by sortNo
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from RoleType t 
+		             where (t.roleType = (select a.roleType from RoleType a where a.rtId=:parentId) 
+		                or (:parentId is null and t.roleType is null)
+		                or (t.roleType is null and (select a.roleType from RoleType a where a.rtId=:parentId) is null)) 
+		             order by t.sortNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTypeTreeHql">
+		            <value>
+		            <![CDATA[
+		             select t.rtId as id,t.roleTypename as title,t.roleType.rtId as parentId,'roleType' as type from RoleType t order by sortNo 
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTreeHql">
+		            <value>
+		            <![CDATA[
+		             select t.roleId as id,t.roleName as title,t.roleType.rtId as parentId,'role' as type 
+		             from SysRole t where :userId='admin'
+		               or (t.roleId in (select b.roleId from SysUser a join a.userRoles b where a.userId=:userId))
+		               or (t.roleId in (select b.roleId from Dept a join a.deptRoles b where a.deptId=:deptId))
+		               or (t.roleId in (select b.roleId from Quarter a join a.quarterRoles b where a.quarterId=:quarterId))
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTreeAndFOrganHql">
+		            <value>
+		            <![CDATA[
+		             select t.roleId as id,t.roleName as title,t.roleType.rtId as parentId,'role' as type 
+		             from SysRole t 
+		             where  t.roleId 
+		             	in(select tt.roleId from RoleObjectRelation tt where tt.roleAssobject.organId = :organId)
+		            ]]></value>
+		            </entry>
+		            <entry key="queryResoureHql">
+		            <value>
+		            <![CDATA[
+		             select r.resourceName
+		             from SysRole t join t.roleResources r where t.roleId=:id order by r.resourceName
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		            <entry key="findDataSql">
+		            <value>
+		            <![CDATA[
+		            select distinct a.* from sys_role a,role_type b 
+		            where a.roletype_id=b.rt_id and b.role_typecode=:typeCode 
+		            order by a.order_no
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

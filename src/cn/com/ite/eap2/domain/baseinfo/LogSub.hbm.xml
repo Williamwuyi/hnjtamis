@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.LogSub" table="LOG_SUB">
+        <comment>数据操作日志详细</comment>
+        <id name="lsId" type="java.lang.String">
+            <column name="LS_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="logData" class="cn.com.ite.eap2.domain.baseinfo.LogData" fetch="select">
+            <column name="DP_ID" length="64">
+                <comment>所属对象</comment>
+            </column>
+        </many-to-one>
+         <many-to-one name="linkData" class="cn.com.ite.eap2.domain.baseinfo.LogData" fetch="select">
+            <column name="OB_ID" length="64">
+                <comment>关联对象</comment>
+            </column>
+        </many-to-one>
+        <property name="attObject" type="java.lang.String">
+            <column name="ATT_OBJECT" length="64">
+                <comment>属性关联对象类型</comment>
+            </column>
+        </property>
+        <property name="year" type="integer">
+            <column name="LOG_YEAR" length="4">
+                <comment>年</comment>
+            </column>
+        </property>
+        <property name="month" type="integer">
+            <column name="LOG_MONTH" length="2">
+                <comment>月</comment>
+            </column>
+        </property>
+        <property name="attName" type="java.lang.String">
+            <column name="ATT_NAME" length="64">
+                <comment>属性名称</comment>
+            </column>
+        </property>
+        <property name="attCode" type="java.lang.String">
+            <column name="ATT_CODE" length="64">
+                <comment>属性编码</comment>
+            </column>
+        </property>
+        <property name="attType" type="integer">
+            <column name="ATT_TYPE" length="2">
+                <comment>属性类型：0主健1一般2对象3集合</comment>
+            </column>
+        </property>
+        <property name="attValue" type="java.lang.String">
+            <column name="ATT_VALUE" length="2000">
+                <comment>属性值</comment>
+            </column>
+        </property>
+        <property name="attOldValue" type="java.lang.String">
+            <column name="ATT_OLD_VALUE" length="2000">
+                <comment>属性老值</comment>
+            </column>
+        </property>
+        <property name="linkType" type="java.lang.Integer">
+            <column name="LINK_TYPE" precision="2" scale="0">
+                <comment>对象关联类型 1 级联 2 引用</comment>
+            </column>
+        </property>
+        <property name="linkId" type="java.lang.String">
+            <column name="LINK_ID" length="64">
+               <comment>业务关联ID</comment>
+            </column>
+        </property>
+        <property name="no" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>顺序号</comment>
+            </column>
+        </property>
+        <set name="logForigns" inverse="false" cascade="all-delete-orphan" lazy="true">
+            <key>
+                <column name="LS_ID" length="64">
+                    <comment>日志明细编号</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.LogForign" />
+        </set>
+    </class>
+</hibernate-mapping>

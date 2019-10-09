@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.workflow.domain.WorkFlowQuarter" table="WORK_FLOW_QUARTER">
+        <comment>工作流执行岗位</comment>
+        <id name="id" type="java.lang.String">
+            <column name="EQ_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="quarterId" type="java.lang.String">
+            <column name="QUARTER_ID" length="64">
+                <comment>岗位ID</comment>
+            </column>
+        </property>
+        <property name="quarterName" type="java.lang.String">
+            <column name="QUARTER_NAME" length="64">
+                <comment>岗位名称</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

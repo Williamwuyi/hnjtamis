@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.DictionaryType" table="DICTIONARY_TYPE">
+        <comment>数据字典类型{'unique':{'typeUnique':'字典类型编码重复！','nameUnique':'字典类型名称重复！'}}</comment>
+        <id name="dtId" type="java.lang.String">
+            <column name="DT_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="dtName" type="java.lang.String">
+            <column name="DT_NAME" length="64">
+                <comment>类型名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="dtCode" type="java.lang.String">
+            <column name="DT_CODE" length="100">
+                <comment>类型编码{'unique':['typeUnique']}</comment>
+            </column>
+        </property>
+        <property name="sysType" type="integer">
+            <column name="SYS_TYPE" length="2">
+                <comment>系统类型 1：系统 2：用户</comment>
+            </column>
+        </property>
+        <property name="levelCode" type="java.lang.String">
+            <column name="LEVEL_CODE" length="64">
+                <comment>级别编码</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>排序号</comment>
+            </column>
+        </property>
+        <property name="remark" type="java.lang.String">
+            <column name="REMARK" length="400">
+                <comment>类型描述</comment>
+            </column>
+        </property>
+        <many-to-one name="dictionaryType" class="cn.com.ite.eap2.domain.baseinfo.DictionaryType" fetch="select">
+            <column name="PARENT_DTID" length="64">
+                <comment>上级字典类型</comment>
+            </column>
+        </many-to-one>
+        <bag name="dictionaryTypes" inverse="false" lazy="true" order-by="ORDER_NO">
+            <key>
+                <column name="PARENT_DTID" length="64">
+                    <comment>子字典类型</comment>
+                </column>
+            </key>  
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.DictionaryType" />
+        </bag>
+        <list name="dictionaries" inverse="false" cascade="all-delete-orphan" lazy="true">
+            <key>
+                <column name="DT_ID" length="64">
+                    <comment>字典数据</comment>
+                </column>
+            </key>
+            <index column="SORT_NO" /> 
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.Dictionary" />
+        </list>
+        <bag name="sysDics" table="SYS_DIC" lazy="true">
+            <key>
+                <column name="DT_ID" length="64">
+                    <comment>所属系统</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.funres.AppSystem" column="APP_ID"/>
+        </bag>
+    </class>
+</hibernate-mapping>

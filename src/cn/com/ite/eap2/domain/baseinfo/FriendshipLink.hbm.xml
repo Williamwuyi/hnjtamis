@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.FriendshipLink" table="FRIENDSHIP_LINK">
+        <comment>友情链结{'unique':{'urlUnique':'友情链结地址重复！','nameUnique':'友情链结名重复！'}}</comment>
+        <id name="flId" type="java.lang.String">
+            <column name="FL_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="flName" type="java.lang.String">
+            <column name="FL_NAME" length="64">
+                <comment>友情链结名{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="flUrl" type="java.lang.String">
+            <column name="FL_URL" length="400">
+                <comment>友情链结地址{'unique':['urlUnique']}</comment>
+            </column>
+        </property>
+        <property name="flIcon" type="java.lang.String">
+            <column name="FL_ICON" length="400">
+                <comment>友情链结图标</comment>
+            </column>
+        </property>
+        <property name="flIconSize" type="java.lang.String">
+            <column name="FL_ICON_SIZE" length="10">
+                <comment>友情链结图标大小</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

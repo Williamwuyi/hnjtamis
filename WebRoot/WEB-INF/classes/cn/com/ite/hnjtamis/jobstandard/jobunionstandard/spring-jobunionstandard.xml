@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="JobUnionStandardListAction" class="cn.com.ite.hnjtamis.jobstandard.jobunionstandard.JobUnionStandardListAction" scope="prototype" >
+		    <property name="service" ref="jobunionstandardServer" />
+		</bean>
+		<bean id="JobUnionStandardFormAction" class="cn.com.ite.hnjtamis.jobstandard.jobunionstandard.JobUnionStandardFormAction" scope="prototype" >
+		    <property name="service" ref="jobunionstandardServer" />
+		</bean>
+		<bean id="jobunionstandardServer" class="cn.com.ite.hnjtamis.jobstandard.jobunionstandard.JobUnionStandardServiceImpl" scope="prototype">
+		    <property name="dao" ref="jobunionstandardDao" />
+		</bean>
+		<bean id="jobunionstandardDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.jobstandard.domain.JobsUnionStandard"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from JobsUnionStandard t where (:jobnameTerm is null or jobscode=:jobnameTerm)
+		             and t.status<>3 
+		             and t.isavailable<>0
+		             and t.standardTerms.isavailable<>0
+		             and t.standardTerms.status<>3
+		             order by t.jobscode,standardTerms.standardname
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryJobIdAndTermId">
+		            <value>
+		            <![CDATA[
+		             from JobsUnionStandard t where (jobscode=:jobscode and t.standardTerms.standardid=:standardid)
+		             and t.isavailable<>0
+		             and t.status<>3
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryQuarterStandardByCode">
+		            <value>
+		            <![CDATA[
+		             from QuarterStandard t where t.quarterCode = :code
+		            ]]></value>
+		            </entry>
+		            
+		            
+		             <entry key="queryJobsUnionStandardInJobscodeNotAvailable">
+		            <value>
+		            <![CDATA[
+		             from JobsUnionStandard t where t.isavailable = 0 and t.jobscode = :jobscode
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

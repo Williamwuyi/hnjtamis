@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="exampublic" extends="eap-default" namespace="/base/exampublic">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	total,list.*
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                	list\[\d+\]\.examArranges,
+                	list\[\d+\]\.examPublicSearchkeies,
+                	list\[\d+\]\.examPublicUsers
+                </param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="comboExamPublish">
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	comboExamPublish.*
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                	comboExamPublish\[\d+\]\.examArranges,
+                	comboExamPublish\[\d+\]\.examPublicSearchkeies,
+                	comboExamPublish\[\d+\]\.examPublicUsers
+                </param>
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="queryComboBoxSelf">
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	comboExamPublish.*
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties">
+                	comboExamPublish\[\d+\]\.examArranges,
+                	comboExamPublish\[\d+\]\.examPublicSearchkeies,
+                	comboExamPublish\[\d+\]\.examPublicUsers
+                </param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="queryExactExamPublish">
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	isExist
+                </param>  
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">
+                	form\.[A-Za-z0-9_]+,
+                	form\.specialitys\[\d+\]\.[A-Za-z0-9_]+,
+                	form\.themePostFormList\[\d+\]\.[A-Za-z0-9_]+,
+                	form\.themeBank\.[A-Za-z0-9_]+,
+                	form\.standardQuarterList\[\d+\]\.[A-Za-z0-9_]+,
+                	form\.organs\[\d+\]\.organName,
+                	form\.organs\[\d+\]\.organId,
+                </param>
+                <param name="excludeProperties">
+                	form.examArranges,
+                	form.examPublicSearchkeies,
+                	form.examPublicUsers
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findExamPublicBase">
+                <param name="includeProperties">
+                	form\.[A-Za-z0-9_]+
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="auditList">
+                <param name="includeProperties">
+                	updateResult
+                </param>
+                <param name="excludeProperties">
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="scexers">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">scexers</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

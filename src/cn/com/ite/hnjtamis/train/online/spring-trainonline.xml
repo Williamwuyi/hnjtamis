@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="TrainOnlineListAction"
+		class="cn.com.ite.hnjtamis.train.online.TrainOnlineListAction"
+		scope="prototype">
+		<property name="service" ref="trainOnlineService" />
+		<property name="trainImplementService" ref="trainImplementService"/>
+		<property name="trainImplementMoniService" ref="trainImplementMoniService"/>
+	</bean>
+	<bean id="TrainOnlineFormAction"
+		class="cn.com.ite.hnjtamis.train.online.TrainOnlineFormAction"
+		scope="prototype">
+		<property name="service" ref="trainOnlineService" />
+	</bean>
+	<bean id="trainOnlineService"
+		class="cn.com.ite.hnjtamis.train.online.TrainOnlineServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="trainOnlineDao" />
+	</bean>
+	<bean id="trainOnlineDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass" value="cn.com.ite.hnjtamis.train.domain.TrainOnline" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		            from TrainOnline t
+		            where ((t.trainImplement.startDate >= :startDateTerm
+		                    and t.trainImplement.endDate <= :endDateTerm)
+		                   or :startDateTerm is null or :endDateTerm is null)
+		                  and (t.studentId = :studentTerm or :studentTerm is null)
+		              order by t.trainImplement.creationDate desc
+		            ]]></value>
+				</entry>
+				<entry key="queryAccessory">
+					<value>
+		            <![CDATA[
+		            from AccessoryFileTransform t
+			            where t.isFinished = 1 and t.id = :acceId
+		            ]]></value>
+				</entry>
+				<entry key="queryExamRecord">
+					<value>
+		            <![CDATA[
+		            from ExamTestpaper t where 
+		               t.relationId = :relationId and t.relationType = :relationType
+		                and (t.userId = :employeeId or :employeeId is null) 
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+		<property name="sqlMap">
+			<map>
+				<entry key="queryCourseTree">
+					<value>
+						<![CDATA[
+							select *
+							  from (select distinct ti.impl_id as impl_id,
+							                        ti.subject as subject,
+							                        cw.course_id as course_id,
+							                        cw.title as course_title,
+							                        cw.type as type,
+							                        min(tic.sort_no) as sort_no,
+							                        f.acce_id as acce_id,
+							                        f.file_path as file_path,
+							                        f.file_name as file_name,
+							                        f.order_no order_no
+							          from train_online           tl,
+							               train_implement        ti,
+							               train_implement_course tic,
+							               courseware_distribute  cd,
+							               courseware             cw,
+							               accessory_file         f
+							         where tl.impl_id = ti.impl_id
+							           and ti.impl_id = tic.impl_id
+							           and tic.md_id = cd.md_id
+							           and cd.course_id = cw.course_id
+							           and cw.course_id = f.item_id
+							           and tl.train_id = :trainOnlineId
+							         group by ti.impl_id,
+							                  ti.subject,
+							                  cw.course_id,
+							                  cw.title,
+							                  cw.type,
+							                  f.acce_id,
+							                  f.file_path,
+							                  f.file_name,
+							                  f.order_no) tt
+							 order by tt.sort_no, tt.order_no
+						]]>
+					</value>
+				</entry>
+				<entry key="queryCourseCount">
+					<value>
+						<![CDATA[
+							select count(*) as course_count
+							  from (select distinct ti.impl_id as impl_id,
+							                        ti.subject as subject,
+							                        cw.course_id as course_id,
+							                        cw.title as course_title,
+							                        cw.type as type,
+							                        min(tic.sort_no) as sort_no,
+							                        f.acce_id as acce_id,
+							                        f.file_path as file_path,
+							                        f.file_name as file_name,
+							                        f.order_no order_no
+							          from train_online           tl,
+							               train_implement        ti,
+							               train_implement_course tic,
+							               courseware_distribute  cd,
+							               courseware             cw,
+							               accessory_file         f
+							         where tl.impl_id = ti.impl_id
+							           and ti.impl_id = tic.impl_id
+							           and tic.md_id = cd.md_id
+							           and cd.course_id = cw.course_id
+							           and cw.course_id = f.item_id
+							           and tl.train_id = :trainOnlineId
+							         group by ti.impl_id,
+							                  ti.subject,
+							                  cw.course_id,
+							                  cw.title,
+							                  cw.type,
+							                  f.acce_id,
+							                  f.file_path,
+							                  f.file_name,
+							                  f.order_no) tt
+						]]>
+					</value>
+				</entry>
+				<entry key="queryPreLeaf">
+					<value>
+						<![CDATA[
+							select tt.sort_no,
+						       tt.acce_id,
+						       tt.file_name,
+						       tt.order_no,
+						       max(tr.duration) as duration,
+						       tr.need_duration
+						  from (select distinct min(tic.sort_no) as sort_no,
+						                        f.acce_id as acce_id,
+						                        f.file_name as file_name,
+						                        f.order_no order_no
+						          from train_online           tl,
+						               train_implement        ti,
+						               train_implement_course tic,
+						               courseware_distribute  cd,
+						               courseware             cw,
+						               accessory_file         f
+						         where tl.impl_id = ti.impl_id
+						           and ti.impl_id = tic.impl_id
+						           and tic.md_id = cd.md_id
+						           and cd.course_id = cw.course_id
+						           and cw.course_id = f.item_id
+						           and tl.train_id = :trainOnlineId
+						         group by ti.impl_id,
+						                  ti.subject,
+						                  cw.course_id,
+						                  cw.title,
+						                  cw.type,
+						                  f.acce_id,
+						                  f.file_path,
+						                  f.file_name,
+						                  f.order_no) tt,
+						       train_online_record tr
+						 where tr.train_id(+) = :trainOnlineId
+						   and tr.leaf_id(+) = tt.acce_id
+						 group by tt.sort_no,
+						          tt.acce_id,
+						          tt.file_name,
+						          tt.order_no,
+						          tr.need_duration
+						 order by tt.sort_no, tt.order_no
+						]]>
+					</value>
+				</entry>
+				<entry key="queryStudyRecord">
+					<value>
+						<![CDATA[
+							select tt.impl_id,
+						       tt.subject,
+						       tt.course_id,
+						       tt.course_title,
+						       tt.type,
+						       tt.is_required,
+						       tt.sort_no,
+						       tt.acce_id,
+						       tt.file_name,
+						       tt.order_no,
+						       min(tr.start_time) as start_time,
+						       max(tr.end_time) as end_time,
+						       sum(tr.duration) as duration,
+						       count(tr.duration) as study_count,
+						       tr.need_duration,
+      						   max(tr.sync_status) finish_status
+						  from (select distinct ti.impl_id,
+						                        ti.subject,
+						                        cw.course_id,
+						                        cw.title as course_title,
+						                        cw.type,
+						                        cd.is_required,
+						                        min(tic.sort_no) as sort_no,
+						                        f.acce_id,
+						                        f.file_name,
+						                        f.order_no
+						          from train_online           tl,
+						               train_implement        ti,
+						               train_implement_course tic,
+						               courseware_distribute  cd,
+						               courseware             cw,
+						               accessory_file         f
+						         where tl.impl_id = ti.impl_id
+						           and ti.impl_id = tic.impl_id
+						           and tic.md_id = cd.md_id
+						           and cd.course_id = cw.course_id
+						           and cw.course_id = f.item_id
+						           and tl.train_id = :trainOnlineId
+						         group by ti.impl_id,
+						                  ti.subject,
+						                  cw.course_id,
+						                  cw.title,
+						                  cw.type,
+						                  cd.is_required,
+						                  f.acce_id,
+						                  f.file_name,
+						                  f.order_no) tt,
+						       train_online_record tr
+						 where tr.train_id(+) = :trainOnlineId
+						   and tr.leaf_id(+) = tt.acce_id
+						 group by tt.impl_id,
+						          tt.subject,
+						          tt.course_id,
+						          tt.course_title,
+						          tt.type,
+						          tt.is_required,
+						          tt.sort_no,
+						          tt.acce_id,
+						          tt.file_name,
+						          tt.order_no,
+						          tr.need_duration
+						 order by tt.sort_no, tt.order_no							
+						]]>
+					</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

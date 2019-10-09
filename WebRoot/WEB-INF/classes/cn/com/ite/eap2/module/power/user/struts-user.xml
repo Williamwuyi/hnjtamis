@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="user" extends="eap-default" namespace="/power/user">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <param name="includeProperties">total,list\[\d+\]\.[A-Za-z0-9_]+,
+                list\[\d+\]\.dept.deptId,list\[\d+\]\.dept.deptName,
+                list\[\d+\]\.employee.employeeId,list\[\d+\]\.employee.employeeName,
+                list\[\d+\]\.proxyEmployee.employeeId,list\[\d+\]\.proxyEmployee.employeeName,
+                list\[\d+\]\.app.appId,list\[\d+\]\.app.appName,
+                list\[\d+\]\.organ.organId,list\[\d+\]\.organ.organName,
+                list\[\d+\]\.userRoles\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeProperties">list\[\d+\]\.password,list\[\d+\]\.proxyResources,list\[\d+\]\.userMapps,list\[\d+\]\.sysMangers</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                form.dept.deptId,form.dept.deptName,
+                form.employee.employeeId,form.employee.employeeName,
+                form.app.appId,form.app.appName,
+                form.organ.organId,form.organ.organName,
+                form.proxyEmployee.employeeId,form.proxyEmployee.employeeName,
+                form.userRoles\[\d+\]\.roleId,form.userRoles\[\d+\]\.roleName,
+                form.proxyResources\[\d+\]\.resourceId,form.proxyResources\[\d+\]\.resourceName</param>
+                <param name="excludeProperties">form.password,form.userMapps,form.sysMangers,form.userRoles\[\d+\]\.roleResources</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="userResourceTree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

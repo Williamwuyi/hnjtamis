@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.power.SysRole" table="SYS_ROLE">
+        <comment>角色{'unique':{'codeUnique':'角色编码重复！','nameUnique':'角色名称重复！'}}</comment>
+        <id name="roleId" type="java.lang.String">
+            <column name="ROLE_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="roleType" class="cn.com.ite.eap2.domain.power.RoleType" fetch="select">
+            <column name="ROLETYPE_ID" length="64">
+               <comment>角色类型{'unique':['nameUnique','codeUnique']}</comment>
+            </column>
+        </many-to-one>
+        <property name="roleName" type="java.lang.String">
+            <column name="ROLE_NAME" length="64">
+               <comment>角色名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="roleCode" type="java.lang.String">
+            <column name="ROLE_CODE" length="64">
+               <comment>角色编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="description" type="java.lang.String">
+            <column name="DESCRIPTION" length="100">
+               <comment>角色描述</comment>
+            </column>
+        </property>
+        <property name="userId" type="java.lang.String">
+            <column name="USER_ID" length="64">
+               <comment>创建用户ID</comment>
+            </column>
+        </property>
+        <property name="userName" type="java.lang.String">
+            <column name="USER_NAME" length="60">
+               <comment>创建用户 名称</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+               <comment>角色顺序号</comment>
+            </column>
+        </property>
+        <set name="roleResources" table="ROLE_RESOURCE" lazy="true">
+            <key>
+                <column name="ROLE_ID" length="64">
+                    <comment>角色资源</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.funres.ModuleResource" column="RESOURCE_ID"/>
+        </set>
+    </class>
+</hibernate-mapping>

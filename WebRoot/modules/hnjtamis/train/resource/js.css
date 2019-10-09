@@ -1,0 +1,47 @@
+#flvViewer{margin:0 auto;height:600px;}
+#flvViewer #flvViewervideos{text-align:center;margin:12px auto 0;}
+#flvViewer #flvViewervideos .notes{font-size:14px;margin:0 0 39px}
+#flvViewer #flvViewervideos h2{font-size:20px;color:#777;font-weight:normal;line-height:24px;margin:0;padding:0}
+#flvViewer #flvViewervideos h3{color:#999;font-weight:bold;margin:4px}
+#flvViewer #jsvideocontainer{text-align:center}
+#flvViewer #jsplaylist{margin-bottom:200px;}
+#flvViewer #jsplaylist .fp-embed{display:none}
+#flvViewer #jsplaylist .fp-prev,#flvViewer #jsplaylist .fp-next{position:absolute;bottom:-112px;background:url("buttons.png") no-repeat;z-index:99;cursor:pointer;color:#333;font-size:14px;text-decoration:none}
+#flvViewer #jsplaylist .fp-prev{left:0;padding-left:16px;background-position:0 -200px;}
+#flvViewer #jsplaylist .fp-prev:hover{background-position:0 -300px;color:#016682}
+#flvViewer #jsplaylist .fp-next{right:0;padding-right:16px;background-position:28px -400px;}
+#flvViewer #jsplaylist .fp-next:hover{background-position:28px -500px;color:#016682}
+#flvViewer #jsplaylist .fp-playlist{position:absolute;text-align:center;bottom:-142px;z-index:2;width:100%;}
+#flvViewer #jsplaylist .fp-playlist a{width:5em;height:5em;-webkit-border-radius:5em;-moz-border-radius:5em;border-radius:5em;display:inline-block;margin:0 12px;background-color:#ededed;cursor:pointer;}
+#flvViewer #jsplaylist .fp-playlist a:hover{background-color:#016682}
+#flvViewer #jsplaylist .fp-playlist a.is-active{background-color:#57bed4 !important}
+#flvViewer ul{margin:0;margin-bottom:20px;padding:0;-webkit-column-count:2;-moz-column-count:2;column-count:2}
+#flvViewer li{background-color:#ededed;-webkit-border-radius:8px;-moz-border-radius:8px;border-radius:8px;border:1px solid #ededed;list-style-type:none;margin:20px 12px;padding:12px;display:inline-block;cursor:pointer;height:120px;width:220px;overflow:hidden;}
+#flvViewer li.selected{background-color:#262626;border:1px solid #212121;color:#ccc}
+#flvViewer li:hover{background-color:#ccc;border:1px solid #ededed;}
+#flvViewer li:hover.selected{background-color:#262626}
+#flvViewer a.button{background-color:#262626;padding:12px 24px;width:160px;margin:0 auto;line-height:1;-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px;color:#fff;cursor:pointer;text-decoration:none;font-size:16px;display:block;}
+#flvViewer a.button:hover{background-color:#ccc;color:#000}
+#flvViewer{width:560px;overflow:hidden;position:relative;margin:0 auto;padding:20px 0;}
+#flvViewer #jscontainer{width:2000px}
+#flvViewer #flvViewervideos,#flvViewer #jsvideocontainer{width:560px;-webkit-transition:all .5s;-moz-transition:all .5s;transition:all .5s;position:absolute;top:0}
+#flvViewer #flvViewervideos{left:-600px;}
+#flvViewer #flvViewervideos.show{left:0}
+#flvViewer #jsvideocontainer{left:600px;}
+#flvViewer #jsvideocontainer.show{left:0}
+@media (max-width: 579px){#flvViewer{width:320px;height:260px;}
+#flvViewer #flvViewervideos .notes{display:none}
+#flvViewer #flvViewervideos ul{-webkit-column-count:1;-moz-column-count:1;column-count:1}
+#flvViewer #flvViewervideos li{margin:8px 20px;padding:4px;display:inline-block;height:auto;width:240px;}
+#flvViewer #flvViewervideos li p{display:none}
+#flvViewer #flvViewervideos h2{font-size:16px}
+#flvViewer #flvViewervideos,#flvViewer #jsvideocontainer{width:95%;margin:0 auto;padding:0}
+#flvViewer #jsplaylist{margin-bottom:80px}
+#flvViewer #jsplaylist .fp-prev,#flvViewer #jsplaylist .fp-next{bottom:-56px}
+#flvViewer #jsplaylist .fp-playlist{bottom:-64px;}
+#flvViewer #jsplaylist .fp-playlist a{width:2em;height:2em;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}
+#flvViewer #flvViewervideos{left:-340px;}
+#flvViewer #flvViewervideos.show{left:0}
+#flvViewer #jsvideocontainer{left:340px;}
+#flvViewer #jsvideocontainer.show{left:0}
+}

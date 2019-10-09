@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.workflow.domain.WorkFlowNode" table="WORK_FLOW_NODE">
+        <comment>工作流结点</comment>
+        <id name="nodeId" type="java.lang.String">
+            <column name="NODE_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="workFlow" class="cn.com.ite.workflow.domain.WorkFlow" fetch="select">
+            <column name="WORK_ID" length="64">
+                <comment>工作流ID</comment>
+            </column>
+        </many-to-one>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" length="64">
+                <comment>结点名称</comment>
+            </column>
+        </property>
+        <property name="code" type="java.lang.String">
+            <column name="CODE" length="64">
+                <comment>结点编码</comment>
+            </column>
+        </property>
+        <property name="type" type="java.lang.String">
+            <column name="TYPE" length="64">
+                <comment>结点类型</comment>
+            </column>
+        </property>
+        <property name="excuteType" type="java.lang.Integer">
+            <column name="EXCUTE_TYPE" precision="1" scale="0">
+                <comment>执行者类型</comment>
+            </column>
+        </property>
+        <property name="url" type="java.lang.String">
+            <column name="URL" length="500">
+                <comment>显示页面地址</comment>
+            </column>
+        </property>
+        <property name="judgeExpress" type="java.lang.String">
+            <column name="JUDGE_EXPRESS" length="500">
+                <comment>判断表达式</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>顺序码</comment>
+            </column>
+        </property>
+        <property name="timer" type="java.lang.Integer">
+            <column name="TIMER" precision="5" scale="0">
+                <comment>定时</comment>
+            </column>
+        </property>
+        <property name="timerToCode" type="java.lang.String">
+            <column name="TIMER_TOCODE" length="64">
+                <comment>定时导向编码</comment>
+            </column>
+        </property>
+        <set name="srcWorkFlowTos" inverse="true" order-by="ORDER_NO">
+            <key>
+                <column name="SRC_NODE_ID" length="64">
+                    <comment>源结点导向组</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.workflow.domain.WorkFlowTo" />
+        </set>
+        <set name="toWorkFlowTo" inverse="true">
+            <key>
+                <column name="TO_NODE_ID" length="64">
+                    <comment>目的结点导向组</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.workflow.domain.WorkFlowTo" />
+        </set>
+        <set name="workFlowQuarters" cascade="all,delete-orphan" inverse="false">
+            <key>
+                <column name="NODE_ID" length="64">
+                    <comment>结点执行岗位</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.workflow.domain.WorkFlowQuarter" />
+        </set>
+    </class>
+</hibernate-mapping>

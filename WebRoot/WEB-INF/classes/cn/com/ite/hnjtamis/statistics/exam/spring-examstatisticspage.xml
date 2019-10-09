@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		  
+		<bean id="ExamStatisticsListAction" class="cn.com.ite.hnjtamis.statistics.exam.ExamStatisticsListAction" scope="prototype" >
+		    <property name="service" ref="examstatisticsServer" />
+		</bean>
+		<!--  
+		<bean id="PersonalRateProgressFormAction" class="cn.com.ite.hnjtamis.personal.rateprogress.PersonalRateProgressFormAction" scope="prototype" >
+		    <property name="service" ref="personalrateprogressServer" />
+		</bean>
+		-->
+		<bean id="examstatisticsServer" class="cn.com.ite.hnjtamis.statistics.exam.ExamStatisticsServiceImpl" scope="prototype">
+		    <property name="dao" ref="examstatisticsDao" />
+		</bean>
+		<bean id="examstatisticsDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.statistics.domain.ViewExamStatistics1"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from ViewExamStatistics1
+		            ]]></value>
+		            </entry>
+		            
+		            
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		            <entry key="querySqlExamStatistics1">
+		            <value>
+		            <![CDATA[
+		             select * from v_statistics_exam1
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="querySqlExamStatisticsTopThree">
+		            <value>
+		            <![CDATA[
+		             select * from V_STATISTICS_EXAM_TOPTHREE t 
+		             where (:yearterm is null or t.examendtime like :yearterm||'%')
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="querySqlExamStatisticsFailList">
+		            <value>
+		            <![CDATA[
+		             select * from V_STATISTICS_EXAM_FAILLIST t 
+		             where (t.EXAM_ID =:examId or :examId is null)
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="querySqlExamStatisticsSection">
+		            <value>
+		            <![CDATA[
+		             select * from V_STATISTICS_EXAM_SECTION t 
+		             where (t.EXAM_ID =:examId or :examId is null)
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

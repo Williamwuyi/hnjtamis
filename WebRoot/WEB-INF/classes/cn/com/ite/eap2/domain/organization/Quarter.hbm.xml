@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.organization.Quarter" table="QUARTER">
+        <comment>岗位</comment>
+        <id name="quarterId" type="java.lang.String">
+            <column name="QUARTER_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="dept" class="cn.com.ite.eap2.domain.organization.Dept" fetch="select">
+            <column name="DEPT_ID" length="64">
+                <comment>部门</comment>
+            </column>
+        </many-to-one>
+        <many-to-one name="quarter" class="cn.com.ite.eap2.domain.organization.Quarter" fetch="select">
+            <column name="PARENT_QUARTER_ID" length="64">
+                <comment>上级岗位</comment>
+            </column>
+        </many-to-one>
+        <property name="quarterCode" type="java.lang.String">
+            <column name="QUARTER_CODE" length="64">
+                <comment>岗位编码</comment>
+            </column>
+        </property>
+        <property name="quarterName" type="java.lang.String">
+            <column name="QUARTER_NAME" length="64">
+                <comment>岗位名称</comment>
+            </column>
+        </property>
+        <property name="quarterType" type="java.lang.String">
+            <column name="QUARTER_TYPE" length="64">
+                <comment>岗位类型</comment>
+            </column>
+        </property>
+        <property name="validation" type="boolean">
+            <column name="IS_VALIDATION" precision="2" scale="0">
+                <comment>是否有效</comment>
+            </column>
+        </property>
+        <property name="remark" type="java.lang.String">
+            <column name="REMARK" length="500">
+                <comment>岗位描叙</comment>
+            </column>
+        </property>
+        <property name="responsibility" type="java.lang.String">
+            <column name="RESPONSIBILITY" length="100">
+                <comment>职责</comment>
+            </column>
+        </property>
+        <property name="levelCode" type="java.lang.String">
+            <column name="LEVEL_CODE" length="64">
+                <comment>级别编码</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>序号</comment>
+            </column>
+        </property>
+        
+        <property name="quarterTrainCode" type="java.lang.String">
+            <column name="QUARTER_TRAIN_CODE" length="64">
+                <comment>培训岗位编码</comment>
+            </column>
+        </property>
+        
+        <property name="quarterTrainId" type="java.lang.String">
+            <column name="QUARTER_TRAIN_ID" length="64">
+                <comment>培训岗位ID</comment>
+            </column>
+        </property>
+        <property name="quarterTrainName" type="java.lang.String">
+            <column name="QUARTER_TRAIN_NAME" length="100">
+                <comment>培训岗位NAME</comment>
+            </column>
+        </property>
+        
+        <bag name="quarterRoles" table="QUARTER_ROLE" lazy="true">
+            <key>
+                <column name="QUARTER_ID" length="64">
+                    <comment>岗位角色</comment>
+                </column>
+            </key>
+            <many-to-many class="cn.com.ite.eap2.domain.power.SysRole" column="ROLE_ID" />
+        </bag>
+        <bag name="quarters" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="PARENT_QUARTER_ID" length="64">
+                    <comment>下级岗位</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Quarter" />
+        </bag>
+        <bag name="employees" inverse="false" order-by="ORDER_NO" lazy="true">
+            <key>
+                <column name="QUARTER_ID" length="64">
+                    <comment>对应员工</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.organization.Employee" />
+        </bag>
+    </class>
+</hibernate-mapping>

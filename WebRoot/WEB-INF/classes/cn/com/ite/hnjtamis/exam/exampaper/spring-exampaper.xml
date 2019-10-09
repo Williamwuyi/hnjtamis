@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 考试安排与试卷生成  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ExamUserManageExcelAction" class="cn.com.ite.hnjtamis.exam.exampaper.ExamUserManageExcelAction" scope="prototype" >
+		    <property name="service" ref="exampaperService" />
+		</bean>
+		<bean id="ExampaperListAction" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperListAction" scope="prototype" >
+		    <property name="service" ref="exampaperService" />
+		</bean>
+		<bean id="ExampaperFormAction" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperFormAction" scope="prototype" >
+		    <property name="service" ref="exampaperService" />
+		    <property name="examThreadService" ref="examThreadService" />
+		</bean>
+		<bean id="ExampaperExportExcelAction" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperExportExcelAction" scope="prototype" >
+		    <property name="service" ref="exampaperService" />
+		</bean>
+		<bean id="exampaperService" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		<bean id="exampaperMoniService" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperMoniServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		
+		<bean id="employeeMoniService" class="cn.com.ite.hnjtamis.exam.exampaper.EmployeeMoniServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		<bean id="trainImplementMoniService" class="cn.com.ite.hnjtamis.exam.exampaper.TrainImplementMoniServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		<bean id="onlineMoniService" class="cn.com.ite.hnjtamis.exam.exampaper.OnlineMoniServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		
+		<bean id="examThreadService" class="cn.com.ite.hnjtamis.exam.exampaper.ExamThreadServiceImpl" scope="prototype">
+		    <property name="dao" ref="exampaperDao" />
+		</bean>
+		
+		<bean id="exampaperDao" class="cn.com.ite.hnjtamis.exam.exampaper.ExampaperDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.Exam"/>
+		    <property name="hqlMap">
+		        <map>
+		        	<entry key="queryExamTestpaperThemeByExamTestpaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperTheme a  where a.examTestpaper.examTestpaperId = :examTestpaperId
+		           		   order by a.sortNum
+		            ]]></value>
+		            </entry>        
+		            <entry key="queryExamTestpaperAnswerkeyByExamTestpaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperAnswerkey a  
+		           		   where a.examTestpaperTheme.examTestpaper.examTestpaperId = :examTestpaperId
+		           		   order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="queryRightExamTestpaperAnswerkeyByThemeId">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperAnswerkey a  
+		           		   where a.examTestpaperTheme.examTestpaperThemeId  = :examTestpaperThemeId
+		           		   order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="queryRightAnsByExamTestpaperId">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperAnswerkey a  
+		           		   where a.examTestpaperTheme.examTestpaper.examTestpaperId  = :examTestpaperId
+		           		   order by a.examTestpaperTheme.examTestpaperThemeId,a.sortNum
+		            ]]></value>
+		            </entry>      
+		        	<entry key="queryExamUserTestpaperInExamHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where (a.state in('5','10','15') or a.state is null)
+		           		   and a.exam.examStartTime is not null and a.exam.examEndTime is not null
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamUserTestpaperOnly2InExamHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where (a.state in('5','10','15') or a.state is null)
+		           		   and a.exam.examStartTime is not null and a.exam.examEndTime is not null
+		           		   and floor(sysdate -TO_DATE(substr(a.exam.examStartTime,0,10),'yyyy-MM-dd')) >=0
+  						   and floor(sysdate -TO_DATE(substr(a.exam.examEndTime,0,10),'yyyy-MM-dd')) <=0
+		            ]]></value>
+		            </entry>
+		        	<entry key="queryExamInUserFin">
+		            <value>
+		            <![CDATA[
+		           		   from Exam a where a.examStartTime is not null and a.examEndTime is not null
+		           		   and exists(select 1 from ExamUserTestpaper v where v.exam.examId = a.examId
+		           		   and v.state in('5','10','15'))
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryExamOnly2InUserFin">
+		            <value>
+		            <![CDATA[
+		           		   from Exam a where 
+		           		   exists(select 1 from ExamUserTestpaper v where v.exam.examId = a.examId
+		           		   and v.state in('5','10','15'))
+		           		   and floor(sysdate -TO_DATE(substr(a.examStartTime,0,10),'yyyy-MM-dd')) >=0
+  						   and floor(sysdate -TO_DATE(substr(a.examEndTime,0,10),'yyyy-MM-dd')) <=0
+  						   and a.examStartTime is not null and a.examEndTime is not null
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryTypeInThemeAndBankHql">
+		            <value>
+		            <![CDATA[
+		           		   from ThemeType a where exists(select 1 from Theme b where b.themeType.themeTypeId = a.themeTypeId 
+		           		   and exists(select 1 from ThemeInBank k where k.theme.themeId = b.themeId and k.themeBank.themeBankId = :themeBankId)) order by a.sortNum
+		            ]]></value>
+		            </entry>
+		        
+		            <entry key="examArrangeForParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from ExamArrange a 
+		           		 where  (a.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+		           		 and (a.examName like '%' || :nameTerm || '%' or :nameTerm is null)
+		           		 and (a.examTypeId = :examTypeIdTerm   or :examTypeIdTerm is null)
+		           		 and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') >= to_date(:creationDateMaxTerm,'yyyy-MM-dd') or :creationDateMaxTerm is null)
+		           		 and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') <  to_date(:creationDateMinTerm,'yyyy-MM-dd') or :creationDateMinTerm is null)  
+		           		 and exists( select 1 from Exam b where b.examArrange.examArrangeId = a.examArrangeId 
+		           		      and (:testpaperNameTerm is null or b.testpaper.testpaperName like '%' || :testpaperNameTerm || '%')
+		           		      and (to_date(substring(b.examStartTime,0,10),'yyyy-MM-dd') >= to_date(:examStartTimeMaxTerm,'yyyy-MM-dd') 
+		           		      or :examStartTimeMaxTerm is null or b.examStartTime is null)
+		           		 	  and (to_date(substring(b.examStartTime,0,10),'yyyy-MM-dd') <  to_date(:examStartTimeMinTerm,'yyyy-MM-dd') 
+		           		 	  or :examStartTimeMinTerm is null or b.examStartTime is null)  
+		           		  )
+		           		  and (:examProperty is null or ',' || :examProperty || ',' like '%,' ||  a.examProperty || ',%' )
+		           		 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="examQueryForParamHql">
+		            <value>
+		            <![CDATA[
+		           		 from Exam a 
+		           		 where  (a.examArrange.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+		           		 and (a.examArrange.examName like '%' || :nameTerm || '%' or :nameTerm is null)
+		           		 and (a.examArrange.examTypeId = :examTypeIdTerm   or :examTypeIdTerm is null)
+		           		 and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') >= to_date(:creationDateMaxTerm,'yyyy-MM-dd') or :creationDateMaxTerm is null)
+		           		 and (to_date(substring(a.creationDate,0,10),'yyyy-MM-dd') <  to_date(:creationDateMinTerm,'yyyy-MM-dd') or :creationDateMinTerm is null)  
+		           		 
+		           		 and (:testpaperNameTerm is null or a.testpaper.testpaperName like '%' || :testpaperNameTerm || '%')
+		           		 and (to_date(substring(a.examStartTime,0,10),'yyyy-MM-dd') >= to_date(:examStartTimeMaxTerm,'yyyy-MM-dd') 
+		           		      or :examStartTimeMaxTerm is null or a.examStartTime is null)
+		           		 and (to_date(substring(a.examStartTime,0,10),'yyyy-MM-dd') <  to_date(:examStartTimeMinTerm,'yyyy-MM-dd') 
+		           		 	  or :examStartTimeMinTerm is null or a.examStartTime is null)  
+		           		 
+		           		  and (:examProperty is null or ',' || :examProperty || ',' like '%,' ||  a.examArrange.examProperty || ',%' )
+		           		 and (a.organId = :organId or :organId is null)
+		           		 order by a.examArrange.creationDate desc,a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="examArrangeReviewedForParamHql">
+			            <value>
+				            <![CDATA[
+				           		 from ExamArrange a 
+					           		 where 
+					           		 (a.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+					           		 and ( :testpaperNameTerm is null or exists( select 1 from Exam b where b.examArrange.examArrangeId = a.examArrangeId 
+		           		        		and b.examName like '%' || :testpaperNameTerm || '%'  ))
+					           		 and (:empId is null or exists (
+					           		 	select e.exam.examArrange.examArrangeId from ExamMarkpeople e where e.exam.examArrange.examArrangeId = a.examArrangeId
+					           		 	and e.empId=:empId
+					           		 ))
+					           		 order by a.creationDate desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examInReviewedForParamHql">
+			            <value>
+				            <![CDATA[
+				           		 from Exam a 
+					           		 where  (a.examArrange.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+					           		 and ( :testpaperNameTerm is null or a.examName like '%' || :testpaperNameTerm || '%')
+					           		 and (:empId is null or exists ( select 1 from ExamMarkpeople e where e.exam.examId = a.examId
+					           		 	 and e.empId=:empId ))
+					           		 and exists( select 1 from ExamTestpaperTheme v where 
+					           		 		v.scoreType = :scoreType
+					           		 		and a.examId = v.examId and v.state in( 15 ,20,25) and v.isUse = 5
+					           		 )
+					           		 and a.publicTime is  null and a.examStartTime is not null
+					           		 order by a.examArrange.creationDate desc,a.creationDate desc,a.examId desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examInReviewedAllEmpForParamHql">
+			            <value>
+				            <![CDATA[
+				           		 from Exam a 
+					           		 where  (a.examArrange.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+					           		 and ( :testpaperNameTerm is null or a.examName like '%' || :testpaperNameTerm || '%')
+					           		 and exists( select 1 from ExamTestpaperTheme v where 
+					           		 		v.scoreType = :scoreType
+					           		 		and a.examId = v.examId and v.state in( 15 ,20,25) and v.isUse = 5
+					           		 )
+					           		 and a.publicTime is  null and a.examStartTime is not null
+					           		 order by a.examArrange.creationDate desc,a.creationDate desc,a.examId desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examInReviewedNotEmpIdForParamHql">
+			            <value>
+				            <![CDATA[
+				           		 from Exam a 
+					           		 where  (a.examArrange.examName like '%' || :examNameTerm || '%' or :examNameTerm is null)
+					           		 and ( :testpaperNameTerm is null or a.examName like '%' || :testpaperNameTerm || '%')
+					           		 and exists ( select 1 from ExamMarkpeople e where e.exam.examId = a.examId
+					           		 	 and e.empId=:empId )
+					           		 and exists( select 1 from ExamTestpaperTheme v where 
+					           		 		v.scoreType = :scoreType
+					           		 		and a.examId = v.examId and v.state in( 15 ,20,25) and v.isUse = 5
+					           		 )
+					           		 and a.publicTime is  null and a.examStartTime is not null
+					           		 order by a.examArrange.creationDate desc,a.creationDate desc,a.examId desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examArrangeForScoreQueryHql">
+			            <value>
+				            <![CDATA[
+				           		 from ExamArrange a 
+					           		 where exists (
+					           		 	select e.exam.examArrange.examArrangeId from ExamUserTestpaper e where 
+					           		 	e.exam.examArrange.examArrangeId = a.examArrangeId
+					           		 	and e.state='30'
+					           		 )
+					           		 order by a.creationDate desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examArrangeOnlyExamForScoreQueryHql">
+			            <value>
+				            <![CDATA[
+				           		 from ExamArrange a 
+					           		 where exists (
+					           		 	select e.exam.examArrange.examArrangeId from ExamUserTestpaper e where 
+					           		 	e.exam.examArrange.examArrangeId = a.examArrangeId
+					           		 	and e.state='30' and (e.relationType  not like 'mo%'  or e.relationType is null)
+					           		 	and e.userOrganId in(
+											select o.organId from Organ o where (o.organId = :organId or o.organ.organId = :organId)
+										)
+					           		 )
+					           		 order by a.creationDate desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examArrangeExamineeForParamHql">
+			            <value>
+				            <![CDATA[
+				           		 from ExamArrange a 
+					           		 where exists (
+					           		 	select e.exam.examArrange.examArrangeId from ExamUserTestpaper e where 
+					           		 	e.exam.examArrange.examArrangeId = a.examArrangeId
+					           		 	and e.employeeId=:empId
+					           		 	and e.state='30' 
+					           		 )
+					           		 and (a.relationType not like 'mo%' or a.relationType is null)
+					           		 order by a.creationDate desc
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="examArrangeInExamIdHql">
+		            <value>
+		            <![CDATA[
+		           		 from ExamArrange a where exists(select 1 from Exam b 
+		           		 	where b.examArrange.examArrangeId = a.examArrangeId and b.examId = :examId)
+		           		 	 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="unExamExamineeHql">
+		            <value>
+		            <![CDATA[
+		           		 from ExamPublicUser a where not exists(select 1 from ExamUserTestpaper b 
+		           		 	where b.examPublicUser.userId = a.userId and b.exam.examArrange.examPublic.publicId = :publicId 
+		           		 			and b.exam.examId = :examId)
+		           		 	and a.examPublic.publicId = :publicIdInUser 
+		           		 	and a.examPublic.isDel = 0 and a.examPublic.state = 20
+		           		 	order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="examExamineeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublicUser a where exists(select 1 from ExamUserTestpaper b 
+		           		 	where b.examPublicUser.userId = a.userId and b.exam.examArrange.examPublic.publicId = :publicId
+		           		 	      and b.exam.examId = :examId)
+		           		 	and a.examPublic.publicId = :publicIdInUser 
+		           		 	and a.examPublic.isDel = 0 and a.examPublic.state = 20
+		           		 	order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="examUserTestpaperInExamHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where a.exam.examId = :examId
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTypeInExampaperHql">
+		            <value>
+		            <![CDATA[
+		           		   from ThemeType a where exists(select 1 from ExamTestpaperTheme b where b.themeTypeId = a.themeTypeId 
+		           		   and b.examTestpaper.examTestpaperId = :examTestpaperId) order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="listInExamCodeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamArrange a where a.examCode = :examCode and a.examArrangeId <> :id
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="listInExamArrangeNameHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamArrange a where a.examName = :examArrangeName and a.examArrangeId <> :id
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="examPublicListHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where a.isDel = 0 and a.state = 20 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="unUsedExamPublicListHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   not exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId)
+		           		   and a.isDel = 0 and a.state = 20 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="usedExamPublicListHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and  a.isDel = 0 and a.state = 20 order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="examPublicListInOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where a.isDel = 0 and a.state = 20  
+		           		   and  exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId)
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="examPublicListInCreateAndJoinOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where a.isDel = 0 and a.state = 20  
+		           		   and  (a.organId = :organId or exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId))
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="examPublicListInCreateAndJoinOrganAndEndTimeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where a.isDel = 0 and a.state = 20  and a.examEndTime >= :examEndTime 
+		           		   and  (a.organId = :organId or exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId))
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="examPublicListInCreateHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where a.isDel = 0 and a.state = 20  
+		           		   and  a.organId = :organId
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            
+		             <entry key="unUsedExamPublicListInCreateHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   not exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and a.isDel = 0 and a.state = 20  
+		           		   and  a.organId = :organId
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		             <entry key="unUsedExamPublicListInCreateAndJoinOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where  
+		           		   not exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and  (a.organId = :organId or exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId))
+		           		    and a.isDel = 0 and a.state = 20 
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="unUsedExamPublicListInOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   not exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and  exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId)
+		           		    and a.isDel = 0 and a.state = 20  
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		              <entry key="usedExamPublicListInCreateHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and a.isDel = 0 and a.state = 20  
+		           		   and  a.organId = :organId
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		             <entry key="usedExamPublicListInCreateAndJoinOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where  
+		           		    exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   and  (a.organId = :organId or exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId))
+		           		    and a.isDel = 0 and a.state = 20 
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		             <entry key="usedExamPublicListInOrganHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamPublic a where 
+		           		   exists(select 1 from ExamArrange tt where tt.examPublic.publicId = a.publicId) 
+		           		   
+		           		   and  exists(select 1 from ExamPublicSearchkey tt 
+		           		    where tt.examPublic.publicId = a.publicId and tt.organId = :organId)
+		           		    and a.isDel = 0 and a.state = 20  
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            
+		            
+		            <entry key="getExamTestpaperByUserIdAndExamIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaper a where a.userId = :userId and a.examId = :examId
+		            ]]></value>
+		            </entry>
+					<entry key="queryExamUserTestpaperByInticketHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where a.inticket = :inticket
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTestpaperInRelationHql">
+		            <value>
+		            <![CDATA[
+		           		   from Testpaper a where a.relationId = :relationId and a.relationType = :relationType order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamInRelationHql">
+		            <value>
+		            <![CDATA[
+		           		   from Exam a where a.relationId = :relationId and a.relationType = :relationType
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamUserTestpaperInRelationHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where a.relationId = :relationId and a.relationType = :relationType and 
+		           		   (a.employeeId = :employeeId or :employeeId is null) order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamArrangeInRelationHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamArrange a where a.relationId = :relationId and a.relationType = :relationType order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryPersonalRateProgressHql">
+		            <value>
+		            <![CDATA[
+		           		   from PersonalRateProgress a where a.businessid = :businessid and a.personcode = :personcode 
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamTestpaperInUseEndHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaper b where exists 
+		           		   (select 1 from ExamUserTestpaper a where a.relationId = :relationId and a.relationType = :relationType and 
+		           		   (a.employeeId = :employeeId or :employeeId is null) and a.examTestpaper.examTestpaperId = b.examTestpaperId) 
+		           		   order by b.creationDate desc
+		            ]]></value>
+		            </entry>
+		             <entry key="queryExamTestpaperInExamUserTestpaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaper b where exists 
+		           		   (select 1 from ExamUserTestpaper a where a.userTestpaperId = :userTestpaperId  
+		           		   		and a.examTestpaper.examTestpaperId = b.examTestpaperId) 
+		           		   order by b.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryUserExamHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserTestpaper a where 
+		           		   (a.inticket = :inticket or :inticket  is null)
+		           		   and (a.idNumber = :idNumber or :idNumber  is null)
+		           		   order by a.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamTestpaperInRelationEmployeeHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaper b where b.relationId = :relationId and b.relationType = :relationType and 
+		           		   (b.employeeId = :employeeId or :employeeId is null)
+		           		   order by b.creationDate desc
+		            ]]></value>
+		            </entry>
+		            <entry key="queryExamTestpaperByExamIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaper b where b.examId = :examId  order by b.creationDate desc
+		            ]]></value>
+		            </entry>
+		             <entry key="queryExamTestpaperThemeByExamIdHql">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperTheme b where b.examId = :examId  order by b.examTestpaper.examTestpaperId,b.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTestpaperThemeByTestpaperIdHql">
+		            <value>
+		            <![CDATA[
+		           		  from TestpaperTheme a where a.testpaper.testpaperId = :testpaperId  order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            <entry key="queryTestpaperThemeAnswerkeyInTestpaperHql">
+		            <value>
+		            <![CDATA[
+		           		 from  TestpaperThemeAnswerkey a where 
+		           		 a.testpaperTheme.testpaper.testpaperId = :testpaperId
+		           		 order by a.testpaperTheme.testpaperThemeId,a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryExamUserAnswerkeyInETIdHql">
+		            <value>
+		            <![CDATA[
+		           		 from  ExamUserAnswerkey a where 
+		           		 a.examTestpaperTheme.examTestpaper.examTestpaperId = :examTestpaperId
+		           		 order by a.examTestpaperTheme.examTestpaper.examTestpaperId,a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            
+		            <entry key="querySysAfficheIncepterInExamId">
+		            <value>
+		            <![CDATA[
+		           		 from  SysAfficheIncepter a where  a.sysAffiche.relationId = :examId
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="querySysAfficheInExamId">
+		            <value>
+		            <![CDATA[
+		           		 from  SysAffiche a where  a.relationId = :examId
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		    
+		    <property name="sqlMap">
+		        <map>
+		            <entry key="queryReviewCount">
+			            <value>
+				            <![CDATA[
+				           		select a.examid,
+								       a.fivecount,
+								       a.tencount,
+								       a.needreviewcount,
+								       a.reviewedcount,
+								       a.backcount,
+								       a.fincount,
+								       b.st,
+								       b.et,
+								       decode(e.state,null,'-1',e.state) examstate
+								  from (select count(decode(tt.state, '5', tt.exam_id, null)) as fivecount,
+								               count(decode(tt.state, '10', tt.exam_id, null)) as tencount,
+								               count(decode(tt.state, '15', tt.exam_id, null)) as needreviewcount,
+								               count(decode(tt.state, '20', tt.exam_id, null)) as reviewedcount,
+								               count(decode(tt.state, '25', tt.exam_id, null)) as backcount,
+								               count(decode(tt.state, '30', tt.exam_id, null)) as fincount,
+								               tt.exam_id examid
+								          from (select * from exam_testpaper where relation_type not like 'mo%' or relation_type is null) t,exam_testpaper_theme tt
+								          where t.exam_testpaper_id = tt.exam_testpaper_id
+								          and tt.score_type = 1
+								         group by tt.exam_id) a,
+								       (select distinct (tt.exam_id) examid,
+								                        tt.start_time st,
+								                        tt.end_time et
+								          from exam_markpeople tt) b,
+								          exam e
+								 where a.examid = b.examid and e.exam_id = a.examid
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryCheckImportCount">
+			            <value>
+				            <![CDATA[
+				           		select count(t.exam_id) allCount,count(decode(t.state,'20',t.exam_id,'30',t.exam_id,null)) passcount ,t.exam_id  
+				           		from exam_testpaper_theme t where t.score_type='2'
+								group by t.exam_id
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryThemeState">
+			            <value>
+				            <![CDATA[
+				           		select t.exam_testpaper_id examTestpaperId,
+								       sum(decode(t.state, 20, 1, 30, 1, 0)) succ,
+								       sum(decode(t.state, 15, 1,25, 1, 0)) unsucc,
+								       sum(decode(t.state, 20, 0, 30, 0, 15,0,25,0,1)) notsub,
+								       t.score_type scoreType
+								  from (select * from exam_testpaper_theme tt where tt.exam_id = :examId and tt.is_use = 5) t
+								  group by t.exam_testpaper_id, t.score_type
+				            ]]>
+			            </value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

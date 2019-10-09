@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.power.UserMapp" table="USER_MAPP">
+        <comment>用户映射</comment>
+        <id name="umId" type="java.lang.String">
+            <column name="UM_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="sysUser" class="cn.com.ite.eap2.domain.power.SysUser" fetch="select">
+            <column name="USER_ID" length="64" />
+        </many-to-one>
+        <many-to-one name="app" class="cn.com.ite.eap2.domain.funres.AppSystem" fetch="select">
+            <column name="APP_ID" length="64" />
+        </many-to-one>
+        <property name="mppAccount" type="java.lang.String">
+            <column name="MPP_ACCOUNT" length="32" />
+        </property>
+        <property name="mppPassword" type="java.lang.String">
+            <column name="MPP_PASSWORD" length="32" />
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="personallog" extends="eap-default" namespace="/personal/log">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+            	<param name="includeProperties">total,list\[\d+\]\.[A-Za-z0-9_]+,
+            	list\[\d+\]\.personalLearningplan.plpid,list\[\d+\]\.personalLearningplan.planname,
+            	list\[\d+\]\.personalRateProgress.rateid,list\[\d+\]\.personalLearningplan.personname</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,
+                form.personalLearningplan.plpid,form.personalLearningplan.planname,
+                form.personalRateProgress.rateid</param>
+                <param name="excludeProperties"></param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="tree">
+                <param name="root">children</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="DocumentLibListAction" class="cn.com.ite.hnjtamis.document.DocumentLibListAction" scope="prototype" >
+		    <property name="service" ref="documentLibService" />
+		</bean>
+		<bean id="DocumentLibFormAction" class="cn.com.ite.hnjtamis.document.DocumentLibFormAction" scope="prototype" >
+		    <property name="service" ref="documentLibService" />
+		</bean>
+		<bean id="documentLibService" class="cn.com.ite.hnjtamis.document.DocumentLibServiceImpl" scope="prototype">
+		    <property name="dao" ref="documentLibDao" />
+		</bean>
+		<bean id="documentLibDao" class="cn.com.ite.hnjtamis.document.DocumentLibDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.document.domain.DocumentLib"/>
+		    <property name="hqlMap">
+		     	<map>
+		            <entry key="getDocumentLibList">
+		            <value>
+		            <![CDATA[
+		               from DocumentLib t where t.isDel = 0 
+		               and (t.documentName like '%' || :documentNameTerm || '%' or :documentNameTerm is null)
+		               and ( ',' || :stateTerm || ',' like '%,' || t.isAnnounced || ',%' or :stateTerm is null)
+		               and ( t.originalOrganId = :organIdTerm or :organIdTerm is null)
+		               order by t.creationDate desc
+		            ]]>
+		            </value>
+		            </entry>
+		            
+		            <entry key="getDocumentLibListByQuarterTrainCode">
+		            <value>
+		            <![CDATA[
+		               from DocumentLib t where t.isDel = 0 
+		               and (t.documentName like '%' || :documentNameTerm || '%' or :documentNameTerm is null)
+		               and ( ',' || :stateTerm || ',' like '%,' || t.isAnnounced || ',%' or :stateTerm is null)
+		               and ( t.originalOrganId = :organIdTerm or :organIdTerm is null)
+		               and ( not exists (select 1 from DocumentSearchkey v where v.documentLib.documentId = t.documentId
+		               		and v.quarterTrainCode is not null)
+		                 or exists(select 1 from DocumentSearchkey v where v.documentLib.documentId = t.documentId
+		                 and v.quarterTrainCode = :quarterTrainCode))
+		               order by t.creationDate desc
+		            ]]>
+		            </value>
+		            </entry>
+		            
+		            <entry key="queryAccessoryByItemId">
+		            <value>
+		            <![CDATA[
+		               from Accessory t where t.itemId = :itemId order by t.orderNo
+		            ]]>
+		            </value>
+		            </entry>
+		            
+		             <entry key="getShareDocumentLibList">
+		            <value>
+		            <![CDATA[
+		               from DocumentLib t where t.isDel = 0 
+		               and  not exists (select 1 from DocumentSearchkey v where v.documentLib.documentId = t.documentId and v.quarterTrainCode is not null)
+		               and  t.isAnnounced = 20
+		               order by t.creationDate desc
+		            ]]>
+		            </value>
+		            </entry>
+		            
+		            <entry key="queryFavoriteHql">
+		            <value>
+		            <![CDATA[
+		               from DocumentSearchkey t where  t.documentLib.documentId = :documentId
+		               and t.favoriteEmployeeId = :favoriteEmployeeId and t.favoriteUserId = :favoriteUserId
+		            ]]>
+		            </value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

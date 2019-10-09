@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.baseinfo.LogData" table="LOG_DATA">
+        <comment>日志主数据</comment>
+        <id name="ldId" type="java.lang.String">
+            <column name="LD_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <property name="dataName" type="java.lang.String">
+            <column name="DATA_NAME" length="64">
+                <comment>数据名称</comment>
+            </column>
+        </property>
+        <many-to-one name="logMain" class="cn.com.ite.eap2.domain.baseinfo.LogMain" fetch="select">
+            <column name="MAIN_ID" length="64">
+                <comment>日志编号</comment>
+            </column>
+        </many-to-one>
+        <property name="dataOperaterType" type="integer">
+            <column name="DATA_OPERATER_TYPE" length="2">
+                <comment>数据操作类型1增加2删除3修改</comment>
+            </column>
+        </property>
+        <property name="dataKey" type="java.lang.String">
+            <column name="DATA_KEY" length="64">
+                <comment>数据标识</comment>
+            </column>
+        </property>
+        <property name="dataCode" type="java.lang.String">
+            <column name="DATA_CODE" length="100">
+                <comment>表名或对象路径名</comment>
+            </column>
+        </property>
+        <property name="no" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>顺序号</comment>
+            </column>
+        </property>
+        <property name="year" type="integer">
+            <column name="LOG_YEAR" length="4">
+                <comment>年</comment>
+            </column>
+        </property>
+        <property name="month" type="integer">
+            <column name="LOG_MONTH" length="2">
+                <comment>月</comment>
+            </column>
+        </property>
+        <set name="logSubs" inverse="false" cascade="all-delete-orphan" lazy="true" order-by="no">
+            <key>
+                <column name="DP_ID" length="64">
+                    <comment>对象属性</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.baseinfo.LogSub" />
+        </set>
+    </class>
+</hibernate-mapping>

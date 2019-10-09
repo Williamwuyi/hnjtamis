@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.power.RoleType" table="ROLE_TYPE">
+        <comment>角色类型{'unique':{'codeUnique':'角色类型编码重复！','nameUnique':'角色类型名称重复！'}}</comment>
+        <id name="rtId" type="java.lang.String">
+            <column name="RT_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="roleType" class="cn.com.ite.eap2.domain.power.RoleType" fetch="select">
+            <column name="PARENT_RT_ID" length="64">
+                <comment>上级角色类型</comment>
+            </column>
+        </many-to-one>
+        <property name="roleTypename" type="java.lang.String">
+            <column name="ROLE_TYPENAME" length="64">
+                <comment>角色类型名称{'unique':['nameUnique']}</comment>
+            </column>
+        </property>
+        <property name="roleTypeCode" type="java.lang.String">
+            <column name="ROLE_TYPECODE" length="64">
+                <comment>角色类型编码{'unique':['codeUnique']}</comment>
+            </column>
+        </property>
+        <property name="desc" type="java.lang.String">
+            <column name="DESCRIPTION" length="200">
+                <comment>角色类型描述</comment>
+            </column>
+        </property>
+        <property name="sortNo" type="integer">
+            <column name="SORT_NO" length="5">
+                <comment>类型排序</comment>
+            </column>
+        </property>
+        <bag name="sysRoles" inverse="false" cascade="all-delete-orphan" lazy="true" order-by="ORDER_NO">
+            <key>
+                <column name="ROLETYPE_ID" length="64">
+                    <comment>下级角色</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.power.SysRole" />
+        </bag>
+        <bag name="roleTypes" inverse="true" order-by="SORT_NO" lazy="true">
+            <key>
+                <column name="PARENT_RT_ID" length="64">
+                    <comment>下级角色类型</comment>
+                </column>
+            </key>
+            <one-to-many class="cn.com.ite.eap2.domain.power.RoleType" />
+        </bag>
+    </class>
+</hibernate-mapping>

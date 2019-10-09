@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="organ" extends="eap-default" namespace="/organization/organ">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <param name="includeProperties">organs.*</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">form\.[A-Za-z0-9_]+,form.organ.organId,form.organ.organName</param>
+                <param name="excludeProperties">form.organMangers,form.organs,form.depts,form.users</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="subList">
+                <param name="includeProperties">organs\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeProperties">organs\[\d+\]\.organMangers,organs\[\d+\]\.organs,
+                organs\[\d+\]\.depts,organs\[\d+\]\.users,organs\[\d+\]\.organ</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result name="export" type="stream">
+                 <!--mime类型-->
+                 <param name="contentType">application/vnd.ms-excel</param>
+                 <!--attachment为提示下载或打开，inline为在IE中打开-->
+                 <param name="contentDisposition">attachment;filename="${fileName}"</param>
+                 <!--配置由那个属性获得文件流，缺省为inputStream-->
+                 <param name="inputName">inputStream</param>
+                 <!-- 指定下载文件的缓存大小-->
+                 <param name="bufferSize">2048</param>
+            </result>
+       </action>
+    </package>
+</struts>

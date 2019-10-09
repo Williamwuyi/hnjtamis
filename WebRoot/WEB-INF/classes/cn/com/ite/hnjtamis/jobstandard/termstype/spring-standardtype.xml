@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="StandardTypeListAction" class="cn.com.ite.hnjtamis.jobstandard.termstype.StandardTypeListAction" scope="prototype" >
+		    <property name="service" ref="standardtypeServer" />
+		</bean>
+		<bean id="StandardTypeFormAction" class="cn.com.ite.hnjtamis.jobstandard.termstype.StandardTypeFormAction" scope="prototype" >
+		    <property name="service" ref="standardtypeServer" />
+		</bean>
+		<bean id="standardtypeServer" class="cn.com.ite.hnjtamis.jobstandard.termstype.StandardTypeServiceImpl" scope="prototype">
+		    <property name="dao" ref="standardtypeDao" />
+		</bean>
+		<bean id="standardtypeDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.jobstandard.domain.StandardTypes"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from StandardTypes where (:typenameTerm is null or typename like '%'||:typenameTerm||'%')
+		             and (:isavailableTerm is null or isavailable = :isavailableTerm)
+		             order by orderno
+		            ]]></value>
+		            </entry>
+		            
+		            <entry key="queryTreeHql">
+		            <value>
+		            <![CDATA[
+		            select a.jstypeid as id,a.typename as title,'' as parentId,'standardtype' as type,
+		            '' as tagName,a.orderno as orderNo 
+		            from StandardTypes a where (a.typename like '%'||:nameTerm||'%' or :nameTerm is null)
+		            and a.isavailable = 1
+		            order by a.typename
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryParentTreeHql">
+		            <value>
+		            <![CDATA[
+		            from StandardTypes t where t.jstypeid <> :id and t.isavailable = 1 order by orderno
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		    <property name="sqlMap">
+		        <map>
+		        	<entry key="updateParentName">
+			            <value>
+				            <![CDATA[
+				              update jobs_standard_types t 
+				              set t.parentname = (select v.typename from jobs_standard_types v where v.jstypeid = t.parentid)
+							   where t.parentid is not null
+				            ]]>
+			            </value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

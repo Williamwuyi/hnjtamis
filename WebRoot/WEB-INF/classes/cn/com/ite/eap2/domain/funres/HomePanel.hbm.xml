@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.funres.HomePanel" table="HOME_PANEL">
+        <comment>首页面板{'unique':{'prUnique':'同一系统内页码、行数、列数重复！','prnameUnique':'同一系统内面板标题重复！'}}</comment>
+        <id name="hpId" type="java.lang.String">
+            <column name="HP_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="appSystem" class="cn.com.ite.eap2.domain.funres.AppSystem" fetch="select">
+            <column name="APP_ID" length="64">
+                <comment>应用系统编号{'unique':['prUnique','prnameUnique']}</comment>
+            </column>
+        </many-to-one>
+        <property name="pageNo" type="integer">
+            <column name="PAGE_NO" precision="2" scale="0">
+                <comment>页码{'unique':['prUnique']}</comment>
+            </column>
+        </property>
+        <property name="row" type="integer">
+            <column name="ROW_SIZE" precision="2" scale="0">
+                <comment>行数{'unique':['prUnique']}</comment>
+            </column>
+        </property>
+        <property name="col" type="integer">
+            <column name="COL_SIZE" precision="2" scale="0">
+                <comment>列数{'unique':['prUnique']}</comment>
+            </column>
+        </property>
+        <property name="title" type="java.lang.String">
+            <column name="TITLE" length="64">
+                <comment>标题{'unique':['prnameUnique']}</comment>
+            </column>
+        </property>
+        <property name="mete" type="java.lang.String">
+            <column name="METE" length="64">
+                <comment>图标格式</comment>
+            </column>
+        </property>
+        <property name="displayType" type="integer">
+            <column name="DISPLAY_TYPE" precision="2" scale="0">
+                <comment>显示类型</comment>
+            </column>
+        </property>
+        <property name="resourceId" type="java.lang.String">
+            <column name="RESOURCE_ID" length="64">
+                <comment>资源编码</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

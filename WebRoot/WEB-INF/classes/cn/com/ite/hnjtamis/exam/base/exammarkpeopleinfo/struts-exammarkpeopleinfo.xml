@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="exammarkpeopleinfo" extends="eap-default" namespace="/base/exammarkpeopleinfo">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="list">
+                <!-- 指定要导出的根对象 -->
+                <!-- <param name="root">list</param> -->
+                <!-- 这个属性表示要包含进JSON数据中的数据(listAttachment\[\d+\]\.realName对指定的对象属性json化)-->
+                <param name="includeProperties">
+                	total,
+                	list\[\d+\]\.[A-Za-z0-9_]+
+                </param>  
+                <!-- 这个属性表示不要包含进JSON数据中的数据。 -->
+                <param name="excludeProperties"></param> 
+                <!-- 这个属性表示去除空数据。 -->
+                <param name="excludeNullProperties">true</param>
+                <!-- ignoreHierarchy这个属性表示是否忽略等级,也就是继承关系,设置为 false后会将父类和子类的属性一起返回 -->
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="delete">
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="find">
+                <param name="includeProperties">
+                	form\.[A-Za-z0-9_]+,
+                	form\.organ\.[A-Za-z0-9_]+,
+                	form\.dept\.[A-Za-z0-9_]+,
+                	form\.quarter\.[A-Za-z0-9_]+,
+                	form\.employee\.[A-Za-z0-9_]+,
+                	form\.specialitys\[\d+\]\.[A-Za-z0-9_]+,
+                	form\.examMarkEmp\.[A-Za-z0-9_]+
+                </param>
+                <param name="excludeProperties">
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="save">
+                <param name="contentType">text/html</param>
+                <param name="includeProperties">msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="queryReviewerCom">
+                <param name="includeProperties">
+                	queryReviewerCom\[\d+\]\.[A-Za-z0-9_]+
+                </param>  
+                <param name="excludeProperties">
+                	queryReviewerCom\[\d+\]\.examMarkpeoples
+                </param> 
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            
+            <result type="json" name="queryZJReviewerCom">
+                <param name="includeProperties">
+                	queryZJReviewerCom\[\d+\]\.[A-Za-z0-9_]+,
+                	queryZJReviewerCom\[\d+\]\.employee\.[A-Za-z0-9_]+
+                </param>  
+                <param name="excludeProperties">
+                	queryReviewerCom\[\d+\]\.quarter,
+                	queryReviewerCom\[\d+\]\.speciality
+                </param> 
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            
+            <!--  -->
+            <result type="json" name="findReviewer">
+                <param name="includeProperties">
+                	reviewerForm\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.examMarkpeopleInfo\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.themeTypes\[\d+\]\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.specialitys\[\d+\]\.[A-Za-z0-9_]+,
+                	reviewerForm\.reviewerChilds\[\d+\]\.examMarkEmp\.[A-Za-z0-9_]+
+                </param>  
+                <param name="excludeProperties">
+                	reviewerForm\.exam\.[A-Za-z0-9_]+
+                </param> 
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            
+             <result type="json" name="examMarkPeopleInfoList">
+                <param name="root">children</param>  
+                <param name="excludeProperties"></param> 
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

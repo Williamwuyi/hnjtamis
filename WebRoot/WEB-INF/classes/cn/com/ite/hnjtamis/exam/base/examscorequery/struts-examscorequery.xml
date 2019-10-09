@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="scorequery" extends="eap-default" namespace="/base/scorequery">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+       		<result name="showExamPaperDetail">
+       			/modules/hnjtamis/base/examScoreQuery/showExamPaperDetail.jsp
+       		</result>
+            <result type="json" name="list">
+                <param name="includeProperties">
+                	list.*
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="singleList">
+                <param name="includeProperties">
+                	list.*
+                </param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

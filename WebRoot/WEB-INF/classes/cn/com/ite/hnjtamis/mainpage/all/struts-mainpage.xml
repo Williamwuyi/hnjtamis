@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="mainpage" extends="eap-default" namespace="/mainpage">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+       		<result name="list">/main.jsp</result>
+            <result type="json" name="showlogin">
+            	<param name="includeProperties">total,
+            	talentreglist\[\d+\]\.[A-Za-z0-9_]+,
+            	sysaffichelist\[\d+\]\.[A-Za-z0-9_]+,
+            	personprogresslist\[\d+\]\.[A-Za-z0-9_]+,</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="coursewarelist">
+            	<param name="includeProperties">total,coursewarelist\[\d+\]\.[A-Za-z0-9_]+</param>
+            	<param name="excludeProperties">coursewarelist\[\d+\]\.poster</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="talentreglist">
+            	<param name="includeProperties">total,talentreglist\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="sysaffichelist">
+            	<param name="includeProperties">total,sysaffichelist\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="personprogresslist">
+            	<param name="includeProperties">total,personprogresslist\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="organization">
+            	<param name="includeProperties">organ.*</param>
+            	<param name="excludeProperties">organ\.organMangers,organ\.users,
+            		organ\.organs,organ\.depts</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="queryShareDocumentLib">
+            	<param name="includeProperties">total,documentlist\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

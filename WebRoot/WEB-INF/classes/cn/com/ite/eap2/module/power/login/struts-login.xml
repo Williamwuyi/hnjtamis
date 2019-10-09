@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <package name="login" extends="eap-default" namespace="/power/login">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+            <result type="json" name="findUserSession">
+                <param name="includeProperties">userSession.*,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="findUSOfEap">
+                <param name="root">userSession</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="proxy_select">
+                <param name="includeProperties">proxyEmployee\[\d+\]\.[A-Za-z0-9_]+,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="login">
+                <param name="includeProperties">success,userSession.*</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="clientLogin">
+                <param name="root">userSession</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param>
+            </result>
+            <result type="json" name="findMenu">
+                <param name="root">appMenus</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="appList">
+                <param name="root">apps</param>
+                <param name="includeProperties">\[\d+\]\.appId,\[\d+\]\.appName,\[\d+\]\.smallPic</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

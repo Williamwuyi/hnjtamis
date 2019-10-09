@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<!-- 在线考试  -->
+<struts>
+    <package name="onlineExam" extends="eap-default" namespace="/onlineExam">
+       <action name="*For*Action" class="{2}Action" method="{1}">
+      	   <result name="onlineExam">/modules/hnjtamis/online/examineeLogin/online.jsp</result>
+       	   <result name="onlineExamMoni">
+       	   	  <param name="location">/modules/hnjtamis/online/examineeLogin/onlineMoni.jsp</param>
+       	   	  <param name="id">${id}</param> 
+       	   	  <param name="isHidden">${isHidden}</param> 
+       	   </result>
+       	   <result name="onlineFastExamMoni">
+       	   	  <param name="location">/modules/hnjtamis/mainEx/exam/online.jsp</param>
+       	   	  <param name="id">${id}</param> 
+       	   	  <param name="isHidden">${isHidden}</param>
+       	   	  <param name="qtype">${qtype}</param> 
+       	   	  <param name="ny">${ny}</param>
+       	   </result>
+       	   <result name="showMoniThemelist">
+       	   	  <param name="location">/modules/hnjtamis/mainEx/exam/moniThemeList.jsp</param>
+       	   	  <param name="themeBankId">${themeBankId}</param>
+       	   	  <param name="examName">${examName}</param>
+       	   	  <param name="qtype">${qtype}</param>
+       	   	  <param name="ny">${ny}</param>
+       	   </result>
+           <result type="json" name="rsContent">
+                <param name="includeProperties">rsContent,msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="list">
+                <param name="includeProperties">list\[\d+\]\.[A-Za-z0-9_]+</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="examIndexUserMoniInit">
+                <param name="includeProperties">id,relationId</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+            <result type="json" name="fkThemeShow">
+                <param name="includeProperties">
+                fktheme\.themeId,
+                fktheme\.lastFkState,
+                themeFkauditFormList\[\d+\]\.fkauditRemark,
+                themeFkauditFormList\[\d+\]\.createdBy,
+                themeFkauditFormList\[\d+\]\.creationDate,
+                msg,success</param>
+                <param name="excludeNullProperties">true</param>
+                <param name="ignoreHierarchy">false</param> 
+            </result>
+       </action>
+    </package>
+</struts>

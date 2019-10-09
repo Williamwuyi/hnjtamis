@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="ExamReviewListAction" class="cn.com.ite.hnjtamis.exam.base.examreview.ExamReviewListAction" scope="prototype" >
+		    <property name="service" ref="examReviewServer" />
+		</bean>
+		<bean id="ExamReviewFormAction" class="cn.com.ite.hnjtamis.exam.base.examreview.ExamReviewFormAction" scope="prototype" >
+		    <property name="service" ref="examReviewServer" />
+		</bean>
+		<bean id="examReviewServer" class="cn.com.ite.hnjtamis.exam.base.examreview.service.ExamReviewServiceImpl" scope="prototype">
+		    <property name="dao" ref="examReviewDao" />
+		</bean>
+		<bean id="examReviewDao" class="cn.com.ite.hnjtamis.exam.base.examreview.dao.ExamReviewDaoImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.hnjtamis.exam.hibernatemap.ExamTestpaperTheme"/>
+		    <property name="hqlMap">
+		        <map>
+		        	<entry key="queryExamTestpaperThemeByExamId">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examId =:examId
+				             and t.scoreType='2'
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamPeopleFirst">
+			            <value>
+				            <![CDATA[
+				             select distinct(t.userId) from ExamTestpaperTheme t where t.examId =:examId
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamPeopleForReView">
+			            <value>
+				            <![CDATA[
+				             select t.userId,t.examTestpaperId from ExamTestpaper t where t.examId =:examId
+				             and t.state=20
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamPeople">
+			            <value>
+				            <![CDATA[
+				             select t.userId,t.examTestpaperId from ExamTestpaper t where t.examId =:examId
+				             and (t.state=:state or t.state=:state1 or t.state=:state2)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePage">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaper.examTestpaperId in 
+				             (select e.examTestpaperId from ExamTestpaper e where e.examId=:examId and e.userId=:userId)
+				             and (t.state=:state or t.state=:anotherstate) 
+				             and t.scoreType='1'
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePageSysOut_back">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaper.examTestpaperId in 
+				             (select e.examTestpaperId from ExamTestpaper e where e.examId=:examId and e.userId=:userId)
+				             and t.state=15 and t.scoreType='2'
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePageSysOut">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examId =:examId and t.state=15 and t.scoreType='2'
+				             order by t.userId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePageBack">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaper.examTestpaperId = 
+				             (select e.examTestpaperId from ExamTestpaper e where 
+				             	e.examTestpaperId = (select v.examTestpaper.examTestpaperId from ExamUserTestpaper v where 
+				             								v.exam.examId=:examId and v.examPublicUser.userId=:userId
+				             							)
+				             )
+				             
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryTimusForSave">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaperThemeId in (:timuIds)
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryTimus">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaper.examId =:examId
+				             and t.examTestpaperThemeId not in (:timuids)
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryTimusAll">
+			            <value>
+				            <![CDATA[
+				             from ExamTestpaperTheme t where t.examTestpaper.examId =:examId
+				             order by t.themeTypeId,t.sortNum
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="updateTestPaperState">
+			            <value>
+				            <![CDATA[
+				           update ExamTestpaper t set t.state='20' where t.examTestpaperId in (:ids)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamUserTestpaperByTestPaperIds">
+			            <value>
+				            <![CDATA[
+				           from ExamUserTestpaper t where t.examTestpaper.examTestpaperId in (:ids)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamTestpaperAnswerkeyByExamId">
+		            <value>
+		            <![CDATA[
+		           		   from ExamTestpaperAnswerkey a  
+		           		   where  a.examTestpaperTheme.examId= :examId
+		           		   and a.examTestpaperTheme.state in( 15 ,20,25) and a.examTestpaperTheme.isUse = 5			
+		           		   order by a.sortNum
+		            ]]></value>
+		            </entry> 
+		            <entry key="queryExamUserAnswerkeyByExamId">
+		            <value>
+		            <![CDATA[
+		           		   from ExamUserAnswerkey a  
+		           		    where  a.examTestpaperTheme.examId= :examId	
+		           		     and a.examTestpaperTheme.state in( 15 ,20,25) and a.examTestpaperTheme.isUse = 5	
+		           		   order by a.sortNum
+		            ]]></value>
+		            </entry>
+		            
+		            
+		            <entry key="queryExamMarkpeopleInEmployeeIdAndExamId">
+		            <value>
+		            <![CDATA[
+		           		   from ExamMarkpeople a  where  a.empId = :employeeId and a.exam.examId = :examId
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		        	<entry key="auditListSql">
+			            <value>
+				            <![CDATA[
+				            update exam_public_user t set t.state='20' where t.user_id in (:updateIds)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryTimusSql">
+			            <value>
+				            <![CDATA[
+				            SELECT * FROM 
+				            ( SELECT A.*, ROWNUM RN FROM 
+       							(SELECT t.* FROM exam_testpaper_theme t where t.exam_id=:examId 
+       							and :timuids not like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+       							and (t.state=:state or t.state=:anotherstate )  
+       							and t.SCORE_TYPE='1' order by t.theme_type_id,t.sort_num) 
+       						  A WHERE ROWNUM <= 10 ) 
+       						WHERE RN >= 0
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryTimusExitsSql">
+			            <value>
+				            <![CDATA[
+				            SELECT * FROM 
+				            ( SELECT A.*, ROWNUM RN FROM 
+       							(SELECT t.* FROM exam_testpaper_theme t where t.exam_id=:examId 
+       							and
+       							 (:timuids not like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+			                      or
+			                      :curtimuids like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+			                      )
+       							and (t.state=:state or t.state=:anotherstate ) 
+       							and t.SCORE_TYPE='1' order by t.theme_type_id,t.sort_num) 
+       						  A WHERE ROWNUM <= 10 ) 
+       						WHERE RN >= 0
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryTimusAllSql">
+			            <value>
+				            <![CDATA[
+				            SELECT * FROM 
+				            ( SELECT A.*, ROWNUM RN FROM 
+       							(SELECT t.* FROM exam_testpaper_theme t where t.exam_id=:examId 
+       							and (t.state=:state or t.state=:anotherstate ) 
+       							and t.SCORE_TYPE='1' order by t.theme_type_id,t.sort_num) 
+       						  A WHERE ROWNUM <= 10 ) 
+       						WHERE RN >= 0
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePageSql">
+			            <value>
+				            <![CDATA[
+       							SELECT t.* FROM exam_testpaper_theme t where 
+       							t.exam_id=:examId and t.user_id=:userId  
+       							and (t.state=:state or t.state=:anotherstate)
+       							and t.SCORE_TYPE='1'
+       							and :timuids not like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+       							order by t.theme_type_id,t.sort_num 
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExamineePageExistsSql">
+			            <value>
+				            <![CDATA[
+       							SELECT t.* FROM exam_testpaper_theme t where 
+       							t.exam_id=:examId and t.user_id=:userId  
+       							and (t.state=:state or t.state=:anotherstate) 
+       							and t.SCORE_TYPE='1'
+       							and 
+			                     (:timuids not like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+			                      or
+			                      :curtimuids like '%,'||t.EXAM_TESTPAPER_THEME_ID||',%' 
+			                      ) 
+       							order by t.theme_type_id,t.sort_num 
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryUpdateReviewedPaper">
+			            <value>
+				            <![CDATA[
+       				select a.testpaperid,b.sumscore from 
+					(select t.exam_testpaper_id testpaperid ,count(t.state) allcount from exam_testpaper_theme t where t.exam_id=:examId
+						group by t.exam_testpaper_id) a,
+					(select tt.exam_testpaper_id btestid,count(tt.state) passcount,sum(tt.score) sumscore from exam_testpaper_theme tt where tt.exam_id=:examId
+						and tt.state='20' group by tt.exam_testpaper_id) b
+					where a.testpaperid = b.btestid and a.allcount = b.passcount
+					and not exists 
+					(select c.exam_testpaper_id from exam_testpaper c where c.exam_id=:examId and c.state='20' and c.exam_testpaper_id=a.testpaperid)
+				            ]]>
+			            </value>
+		            </entry>
+		            <entry key="queryExcelByExamIdSql">
+			            <value>
+				            <![CDATA[
+				           		select t.exam_testpaper_theme_id,e.exam_name,t.sort_num,t.theme_name,u.user_name,u.inticket,t.default_score
+								  from exam_user_testpaper u, exam_testpaper_theme t,
+								  exam e
+								 where u.testpaper_id = t.exam_testpaper_id
+								 and e.exam_id=t.exam_id
+								 and u.exam_id =:examId
+								 and t.score_type='2'
+								 order by u.inticket, t.sort_num
+				            ]]>
+			            </value>
+		            </entry>
+		            
+		            <entry key="queryExamUserNameSql">
+			            <value>
+				            <![CDATA[
+				           		select tt.user_id,tt.user_name,tt.inticket from exam_user_testpaper tt 
+				           		where exists(
+									select distinct(t.user_id) from exam_testpaper_theme t 
+									where t.score_type='2' and t.exam_id=:examId
+									and t.exam_id=tt.exam_id
+								)
+				            ]]>
+			            </value>
+		            </entry>
+					<entry key="queryExamThemeState">
+			            <value>
+				            <![CDATA[
+				           		select sum(decode(t.state, 20, 1, 30, 1, 0)) succ,
+								       sum(decode(t.state, 15, 1, 25, 1, 0)) unsucc,
+								       sum(decode(t.state, 20, 0, 30, 0, 15, 0, 25, 0, 1)) notsub,
+								       t.score_type scoreType
+								  from exam_testpaper_theme t
+								 where t.exam_id = :examId
+								 and t.is_use = 5
+								 group by t.score_type
+				            ]]>
+			            </value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

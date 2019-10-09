@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="UserListAction" class="cn.com.ite.eap2.module.power.user.UserListAction" scope="prototype" >
+		    <property name="service" ref="userServer" />
+		</bean>
+		<bean id="UserFormAction" class="cn.com.ite.eap2.module.power.user.UserFormAction" scope="prototype" >
+		    <property name="service" ref="userServer" />
+		</bean>
+		<bean id="userServer" class="cn.com.ite.eap2.module.power.user.UserServiceImpl" scope="prototype">
+		    <property name="dao" ref="userDao" />
+		    <property name="deptServcie" ref="deptServer" />
+		</bean>
+		<bean id="userDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.power.SysUser"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		           select distinct t from SysUser t left join t.employee e left join t.userRoles f 
+		                  left join f.roleResources j left join t.sysMangers k
+		            where (t.account like '%'||:accountTerm||'%' or :accountTerm is null)
+		              and (e.employeeName like '%'||:employeeTerm||'%' or :employeeTerm is null)
+		              and (e.dept.deptId = :deptTerm or t.organ.organId=:deptTerm or :deptTerm is null)
+		              and t.organ.levelCode like (select x.levelCode from Organ x where x.organId=:organTerm)||'%'
+		              and t.userId<>'admin'
+		              and (t.validation = :valid or :valid is null)
+		              and (((f.roleId is not null or k.appId is not null) and :grantTerm='1') 
+		                   or :grantTerm is null 
+		                   or (f.roleId is null and k.appId is null and :grantTerm='0'))
+		              and (:roleTerm=f.roleId or :roleTerm is null)
+		              and (:resourceTerm=j.resourceId or :resourceTerm is null)
+		              order by t.account
+		            ]]></value>
+		            </entry>
+		            <entry key="queryResourceHql"><!--用户的功能资源-->
+		            <value>
+		            <![CDATA[
+		            select a from ModuleResource a where (:userId='admin' 
+		                  or exists (select x.userId from SysUser x join x.sysMangers y 
+		                              where ((y.appId=a.appModule.appSystem.appId and a.appModule.appSystem.appId!='system') or 
+		                                        (a.popedomType=1 and a.appModule.appSystem.appId='system'))
+		                                     and x.userId=:userId)
+		                  or exists (select x.userId from SysUser x join x.userRoles y join y.roleResources y 
+		                              where y.resourceId=a.resourceId and x.userId=:userId)
+		                ) order by a.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="userTreeHql"><!--用户树查询-->
+		            <value>
+		            <![CDATA[
+		            select a.account as account,b.employeeName as employeeName,a.organ.organId as organId,
+		                   a.userId as userId,b.employeeId as employeeId,b.dept.deptId as deptId
+		             from SysUser a left join a.employee b 
+		             where (a.account like '%'||:nameTerm||'%' or :nameTerm is null)
+		               and (b is null or b.employeeName like '%'||:nameTerm||'%' or :nameTerm is null)
+		               and a.userId <> 'admin'
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		</bean>
+</beans>

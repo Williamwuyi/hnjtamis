@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="TrainImplementListAction" class="cn.com.ite.hnjtamis.train.impl.TrainImplementListAction"
+		scope="prototype">
+		<property name="service" ref="trainImplementService" />
+		<property name="themeBankService"  ref="themeBankServer" />
+	</bean>
+	<bean id="TrainImplementFormAction" class="cn.com.ite.hnjtamis.train.impl.TrainImplementFormAction"
+		scope="prototype">
+		<property name="service" ref="trainImplementService" />
+	</bean>
+	<bean id="trainImplementService"
+		class="cn.com.ite.hnjtamis.train.impl.TrainImplementServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="trainImplementDao" />
+	</bean>
+	<bean id="trainImplementDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass"
+			value="cn.com.ite.hnjtamis.train.domain.TrainImplement" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		             from TrainImplement t 
+		            where (t.subject like '%'||:subjectTerm||'%' or :subjectTerm is null)
+		                and t.syncStatus <> 3 and t.isDel = 0
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+				<entry key="queryQuarterCourseHql">
+					<value>
+		            <![CDATA[
+		            select distinct t from TrainImplement t join t.trainImplementCourses c ,JobsUnionSpeciality j
+		            where j.jobscode = c.quarter.id and j.speciality = c.speciality		                
+		                and t.syncStatus <> 3 and t.isDel = 0 and t.isAudited = 1
+		                and c.quarter.id = :quarterTerm
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+				<entry key="queryEmployeeCourseHql">
+					<value>
+		            <![CDATA[
+		            select distinct t from TrainImplement t join t.trainImplementCourses c ,JobsUnionSpeciality j
+		            where j.jobscode = c.quarter.id and j.speciality = c.speciality		                
+		                and t.syncStatus <> 3 and t.isDel = 0 and t.isAudited = 1
+		                and c.quarter.id = :quarterTerm
+		                and not exists(select t.id from t.trainOnlines o where o.studentId = :studentTerm)
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

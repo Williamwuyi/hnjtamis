@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		<bean id="DicListAction" class="cn.com.ite.eap2.module.baseinfo.dictionary.DictionaryListAction" scope="prototype" >
+		    <property name="service" ref="dicServer" />
+		</bean>
+		<bean id="DicFormAction" class="cn.com.ite.eap2.module.baseinfo.dictionary.DictionaryFormAction" scope="prototype" >
+		    <property name="service" ref="dicServer" />
+		</bean>
+		<bean id="dicServer" class="cn.com.ite.eap2.core.service.DefaultServiceImpl" scope="prototype">
+		    <property name="dao" ref="dicDao" />
+		</bean>
+		<bean id="dicDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl" scope="prototype">
+		    <property name="template" ref="template" />
+		    <property name="pagingHandler" ref="oraclePagingHandler"/>
+		    <property name="entityClass" value="cn.com.ite.eap2.domain.baseinfo.DictionaryType"/>
+		    <property name="hqlMap">
+		        <map>
+		            <entry key="queryHql">
+		            <value>
+		            <![CDATA[
+		             from DictionaryType t 
+		            where t.dtName like '%'||:nameTerm||'%' and t.dtCode like '%'||:codeTerm||'%' 
+					order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="querySubHql">
+		            <value>
+		            <![CDATA[
+		             from DictionaryType t 
+		             where (t.dictionaryType = (select a.dictionaryType from DictionaryType a where a.dtId=:parentId)
+		                or (:parentId is null and t.dictionaryType is null)
+		                or (t.dictionaryType is null and (select a.dictionaryType from DictionaryType a where a.dtId=:parentId) is null))
+		            order by t.orderNo
+		            ]]></value>
+		            </entry>
+		            <entry key="queryRmoteHql">
+		            <value>
+		            <![CDATA[
+		             from DictionaryType t where t.dtCode in (:codesTerm) order by t.orderNo
+		            ]]></value>
+		            </entry>
+		       </map>
+		   </property>
+		   <property name="sqlMap">
+		        <map>
+		            <entry key="findDataSql">
+		            <value>
+		            <![CDATA[
+		            select distinct a.* from dictionary a,dictionary_type b 
+		            where a.dt_id=b.dt_id and b.dt_code=:typeCode 
+		            order by a.sort_no
+		            ]]></value>
+		            </entry>
+		        </map>
+		    </property>
+		</bean>
+</beans>

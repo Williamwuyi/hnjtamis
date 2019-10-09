@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.com.ite.eap2.domain.funres.MenuRecord" table="menu_record">
+        <comment>菜单记录</comment>
+        <id name="mrId" type="java.lang.String">
+            <column name="MR_ID" length="64" />
+            <generator class="uuid.hex" />
+        </id>
+        <many-to-one name="appMenu" class="cn.com.ite.eap2.domain.funres.AppMenu" fetch="select">
+            <column name="MENU_ID" length="64">
+                <comment>菜单编号</comment>
+            </column>
+        </many-to-one>
+        <property name="userId" type="java.lang.String">
+            <column name="USER_ID" length="64">
+                <comment>用户ID</comment>
+            </column>
+        </property>
+        <property name="openTime" type="java.util.Date">
+            <column name="OPEN_TIME" length="7">
+                <comment>最近时间</comment>
+            </column>
+        </property>
+        <property name="userSize" type="java.lang.Integer">
+            <column name="USER_SIZE" precision="5" scale="0">
+                <comment>使用次数</comment>
+            </column>
+        </property>
+        <property name="orderNo" type="java.lang.Integer">
+            <column name="ORDER_NO" precision="5" scale="0">
+                <comment>排序</comment>
+            </column>
+        </property>
+    </class>
+</hibernate-mapping>

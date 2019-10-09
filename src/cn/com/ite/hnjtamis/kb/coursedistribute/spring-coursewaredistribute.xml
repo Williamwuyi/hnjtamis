@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<bean id="CoursewareDistributeListAction" class="cn.com.ite.hnjtamis.kb.coursedistribute.CoursewareDistributeListAction"
+		scope="prototype">
+		<property name="service" ref="coursewareDistributeService" />
+	</bean>
+	<bean id="CoursewareDistributeFormAction" class="cn.com.ite.hnjtamis.kb.coursedistribute.CoursewareDistributeFormAction"
+		scope="prototype">
+		<property name="service" ref="coursewareDistributeService" />
+	</bean>
+	<bean id="coursewareDistributeService" class="cn.com.ite.hnjtamis.kb.coursedistribute.CoursewareDistributeServiceImpl"
+		scope="prototype">
+		<property name="dao" ref="coursewareDistributeDao" />
+	</bean>
+	<bean id="coursewareDistributeDao" class="cn.com.ite.eap2.core.hibernate.HibernateDefaultDAOImpl"
+		scope="prototype">
+		<property name="template" ref="template" />
+		<property name="pagingHandler" ref="oraclePagingHandler" />
+		<property name="entityClass" value="cn.com.ite.hnjtamis.kb.domain.CoursewareDistribute" />
+		<property name="hqlMap">
+			<map>
+				<entry key="queryHql">
+					<value>
+		            <![CDATA[
+		           from CoursewareDistribute t 
+		            where (t.courseware.organ.organId = :organId or :organId is null)
+		                 and (t.courseware.title like '%'||:titleTerm||'%' or :titleTerm is null)	
+		                 and (t.courseware.type = :typeTerm or :typeTerm is null)
+		              order by t.creationDate desc 
+		            ]]></value>
+				</entry>
+				<entry key="queryQuarterAndSpecialityHql">
+					<value>
+		            <![CDATA[
+		           select distinct t.quarter.quarterId||','||t.speciality.specialityid as id,
+		                           t.quarter.quarterName||'('||t.speciality.specialityname||')' as title,
+		                           '' as parentId
+		               from CoursewareDistribute t 
+		            where t.courseware.isAudited = 1 
+		              and (t.courseware.organ.organId = :organId or :organId is null)
+		              order by t.quarter.quarterName||'('||t.speciality.specialityname||')' 
+		            ]]></value>
+				</entry>
+				<entry key="queryByQuarterAndSepcialityHql">
+					<value>
+		            <![CDATA[
+		           from CoursewareDistribute t 
+		            where t.quarter.quarterId = :quarterId and t.speciality.specialityid = :specialityid
+		               and t.courseware.isAudited = 1
+		               and (t.courseware.organ.organId = :organId or :organId is null)
+		              order by t.courseware.title desc 
+		            ]]></value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>
